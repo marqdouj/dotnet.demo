@@ -1,0 +1,11 @@
+﻿@page "/pkg-general"
+
+<FluentLayout>
+	<FluentHeader>@repo</FluentHeader>
+
+	<ReadMeView Repository="@repo"/>
+</FluentLayout>
+
+@code {
+	private readonly string repo = "dotnet.general";
+}

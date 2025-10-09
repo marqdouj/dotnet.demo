@@ -1,0 +1,13 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<FluentLayout>
+	<FluentHeader>Welcome!</FluentHeader>
+
+	<ReadMeView Repository="@repo"/>
+</FluentLayout>
+
+@code{
+	private readonly string repo = "dotnet.demo";
+} new Fluent Blazor app.
