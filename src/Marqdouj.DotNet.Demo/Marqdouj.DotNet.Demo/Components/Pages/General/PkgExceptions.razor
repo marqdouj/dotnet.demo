@@ -3,55 +3,53 @@
 @rendermode InteractiveServer
 @inject IDialogService DialogService
 
-<PageTitle>General - Exceptions</PageTitle>
+<PageTitle>@subject</PageTitle>
 
 <FluentLayout>
-    <FluentHeader>Exception Extensions</FluentHeader>
+    <PkgPageHeader Header="@subject"
+				   HRefCode="@hRefCode"
+                   Subject="@subject"/>
 
     <FluentStack Orientation="Orientation.Vertical">
-        <FluentLabel Typo="Typography.Subject">The following demo demonstrates the Exception extensions</FluentLabel>
+        <FluentCard MinimalStyle="true">
+            <FluentLabel>Generated Exception:</FluentLabel>
+            <CodeText Text="@exText" />
+        </FluentCard>
 
-        <FluentLabel>Exception Generated:</FluentLabel>
-        <code>
-            new Exception("Outer Exception.", new Exception("Inner Exception.", new Exception("Inner Inner Exception.")))
-        </code>
+        <FluentGrid>
+            <FluentGridItem>
+                <FluentCard>
+                    <FluentLabel Typo="Typography.H5">Exception.ToMessage()</FluentLabel>
+                    <p>Resolves all messages as a string and then displays the message in a Fluent dialog</p>
+                    <FluentButton Appearance="Appearance.Accent" OnClick="ToMessageDialog">Test</FluentButton>
+                    <FluentLabel Typo="Typography.H6">Output:</FluentLabel>
+                    <FluentLabel>@ToMessageValue</FluentLabel>
+                </FluentCard>
+            </FluentGridItem>
+            <FluentGridItem>
+                <FluentCard>
+                    <FluentLabel Typo="Typography.H5">Exception.ToMessageList()</FluentLabel>
+                    <p>Resolves all messages as a List, and then displays the messages in a Fluent dialog</p>
+                    <FluentButton Appearance="Appearance.Accent" OnClick="ToMessageListDialog">Test</FluentButton>
 
-        <FluentStack>
-            <FluentCard Width="400px" Height="200px">
-                <FluentLabel Typo="Typography.H5">Exception.ToMessage()</FluentLabel>
-                <p>Resolves all messages as a string and then displays the message in a Fluent dialog</p>
-                <FluentButton Appearance="Appearance.Accent" OnClick="ToMessageDialog">Test</FluentButton>
-                <FluentLabel Typo="Typography.Body">C# Value: @ToMessageValue</FluentLabel>
-            </FluentCard>
-
-            <FluentCard Width="400px" Height="200px">
-                <FluentLabel Typo="Typography.H5">Exception.ToMessageList()</FluentLabel>
-                <p>Resolves all messages as a List, and then displays the messages in a Fluent dialog</p>
-                <FluentButton Appearance="Appearance.Accent" OnClick="ToMessageListDialog">Test</FluentButton>
-
-                @foreach (var item in ToMessageListValue)
-                {
-                    <FluentLabel Typo="Typography.Body">C# Value: @item</FluentLabel>
-                }
-            </FluentCard>
-        </FluentStack>
+                    <FluentLabel Typo="Typography.H6">Output:</FluentLabel>
+                    @foreach (var item in ToMessageListValue)
+                    {
+                        <FluentLabel>@item</FluentLabel>
+                    }
+                </FluentCard>
+            </FluentGridItem>
+        </FluentGrid>
     </FluentStack>
 </FluentLayout>
 
-<style>
-    code {
-        font-family: Consolas,"courier new";
-        color: blue;
-        background-color: #f1f1f1;
-        padding: 2px;
-        font-size: 105%;
-    }
-</style>
-
 @code {
     private Exception ex = new Exception("Outer Exception.", new Exception("Inner Exception.", new Exception("Inner Inner Exception.")));
+    private readonly string exText = "new Exception(\"Outer Exception.\", new Exception(\"Inner Exception.\", new Exception(\"Inner Inner Exception.\")))";
     private string ToMessageValue = "";
     private List<string> ToMessageListValue = [];
+    private readonly string hRefCode = HRefCodeSource.General.CodeUrl("Extensions/Exceptions.cs");
+    private readonly string subject = "Exception Extensions";
 
     private async Task ToMessageDialog()
     {

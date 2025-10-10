@@ -1,5 +1,5 @@
-﻿@page "/pkg-general-strings"
-@using Marqdouj.DotNet.General.Extensions
+﻿@page "/pkg-general-statemodel"
+@using Marqdouj.DotNet.General
 @rendermode InteractiveServer
 @inject IDialogService DialogService
 
@@ -13,6 +13,6 @@
 </FluentLayout>
 
 @code {
-    private readonly string hRefCode = HRefCodeSource.General.CodeUrl("Extensions/Strings.cs");
-    private readonly string subject = "String Extensions";
+    private readonly string hRefCode = HRefCodeSource.General.CodeUrl("StateModel.cs");
+    private readonly string subject = nameof(StateModel);
 }

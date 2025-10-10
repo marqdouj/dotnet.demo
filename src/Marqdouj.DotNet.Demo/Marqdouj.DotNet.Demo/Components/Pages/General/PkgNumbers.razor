@@ -3,13 +3,16 @@
 @rendermode InteractiveServer
 @inject IDialogService DialogService
 
-<PageTitle>General - Numbers</PageTitle>
+<PageTitle>@subject</PageTitle>
 
 <FluentLayout>
-	<FluentHeader>Numbers</FluentHeader>
+    <PkgPageHeader Header="@subject"
+                   HRefCode="@hRefCode"
+                   Subject="@subject" />
 
 </FluentLayout>
 
 @code {
-
+    private readonly string hRefCode = HRefCodeSource.General.CodeUrl("Extensions/Numbers.cs");
+    private readonly string subject = "Number Extensions";
 }

@@ -1,15 +1,18 @@
 ﻿@page "/pkg-general-enumlist"
-@using Marqdouj.DotNet.General.Extensions
+@using Marqdouj.DotNet.General
 @rendermode InteractiveServer
 @inject IDialogService DialogService
 
-<PageTitle>General - EnumList</PageTitle>
+<PageTitle>@subject</PageTitle>
 
 <FluentLayout>
-	<FluentHeader>EnumList</FluentHeader>
+    <PkgPageHeader Header="@subject"
+                   HRefCode="@hRefCode"
+                   Subject="@subject" />
 
 </FluentLayout>
 
 @code {
-
+    private readonly string hRefCode = HRefCodeSource.General.CodeUrl("EnumList.cs");
+    private readonly string subject = "EnumList";
 }

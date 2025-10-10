@@ -1,15 +1,18 @@
 ﻿@page "/pkg-general-nrange"
-@using Marqdouj.DotNet.General.Extensions
+@using Marqdouj.DotNet.General
 @rendermode InteractiveServer
 @inject IDialogService DialogService
 
-<PageTitle>General - NRange</PageTitle>
+<PageTitle>@subject</PageTitle>
 
 <FluentLayout>
-	<FluentHeader>NRange</FluentHeader>
+    <PkgPageHeader Header="@subject"
+                   HRefCode="@hRefCode"
+                   Subject="@subject" />
 
 </FluentLayout>
 
 @code {
-
+    private readonly string hRefCode = HRefCodeSource.General.CodeUrl("NRange.cs");
+    private readonly string subject = "NRange";
 }
