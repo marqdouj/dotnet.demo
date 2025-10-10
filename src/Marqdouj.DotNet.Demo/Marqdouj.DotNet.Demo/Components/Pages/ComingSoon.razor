@@ -1,0 +1,61 @@
+﻿<div class="bg-img">
+    <div class="top-left">
+        <p>@TopLeftText</p>
+    </div>
+    <div class="middle">
+        <h1>@MiddleText</h1>
+        <hr>
+        <p id="demo" style="font-size:30px"></p>
+    </div>
+    <div class="bottom-left">
+        <p>@BottomLeftText</p>
+    </div>
+</div>
+
+<style>
+    .bg-img {
+        background-image: url('ComingSoon.jpg');
+        height: 1000%;
+        width: 100%;
+        background-position: center;
+        background-size: cover;
+        position: relative;
+        color: white;
+        font-family: "Courier New", Courier, monospace;
+        font-size: 25px;
+    }
+
+    .top-left {
+        position: absolute;
+        top: 0;
+        left: 16px;
+    }
+
+    .bottom-left {
+        position: absolute;
+        bottom: 0;
+        left: 16px;
+    }
+
+    .middle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+
+    hr {
+        margin: auto;
+        width: 40%;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public string? MiddleText { get; set; }
+    [Parameter]
+    public string? TopLeftText { get; set; }
+    [Parameter]
+    public string? BottomLeftText { get; set; }
+}

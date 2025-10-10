@@ -6,7 +6,8 @@
     <nav class="sitenav" aria-labelledby="main-menu">
         <FluentNavMenu Id="main-menu" Collapsible="true" Width="250" Title="Navigation menu" @bind-Expanded="expanded" CustomToggle="true">
             <FluentNavLink Href="/" Match="NavLinkMatch.All" Icon="@(new Icons.Regular.Size20.Home())" IconColor="Color.Accent">Home</FluentNavLink>
-            <FluentNavGroup Title="DotNet.General">
+            
+            <FluentNavGroup Title="General">
                 <FluentNavLink Href="pkg-general" Icon="@(new Icons.Regular.Size20.Notebook())" IconColor="Color.Accent">Details</FluentNavLink>
                 <FluentNavGroup Title="Extensions">
                     <FluentNavLink Href="pkg-general-exceptions" Icon="@(new Icons.Regular.Size20.CommentError())" IconColor="Color.Accent">Exceptions</FluentNavLink>
@@ -18,6 +19,14 @@
                     <FluentNavLink Href="pkg-general-nrange" Icon="@(new Icons.Regular.Size20.DesignIdeas())" IconColor="Color.Accent">NRange</FluentNavLink>
                     <FluentNavLink Href="pkg-general-statemodel" Icon="@(new Icons.Regular.Size20.DesignIdeas())" IconColor="Color.Accent">StateModel</FluentNavLink>
                 </FluentNavGroup>
+            </FluentNavGroup>
+
+            <FluentNavGroup Title="Components">
+                <FluentNavLink Href="pkg-components" Icon="@(new Icons.Regular.Size20.Notebook())" IconColor="Color.Accent">Details</FluentNavLink>
+            </FluentNavGroup>
+
+            <FluentNavGroup Title="Components (Fluent)">
+                <FluentNavLink Href="pkg-components-fluent" Icon="@(new Icons.Regular.Size20.Notebook())" IconColor="Color.Accent">Details</FluentNavLink>
             </FluentNavGroup>
         </FluentNavMenu>
     </nav>
