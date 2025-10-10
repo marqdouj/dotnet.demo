@@ -1,0 +1,24 @@
+﻿<FluentCard>
+    <FluentLabel Typo="Typography.Header">string.ToNewLine()</FluentLabel>
+    <FluentLabel>
+        Converts line endings in the specified string to
+        <FluentNavLink Href="https://learn.microsoft.com/en-us/dotnet/api/system.environment.newline" Target="_blank">
+            <CodeText Text="Environment.NewLine" />
+        </FluentNavLink>
+    </FluentLabel>
+    <br />
+    <FluentStack>
+        <FluentLabel>Output (non-Unix):</FluentLabel>
+        <FluentLabel Style="background-color:#f1f1f1" Typo="Typography.Body">@outputNonUnix</FluentLabel>
+    </FluentStack>
+
+    <FluentStack>
+        <FluentLabel>Output (Unix):</FluentLabel>
+        <FluentLabel Style="background-color:#f1f1f1" Typo="Typography.Body">@outputUnix</FluentLabel>
+    </FluentStack>
+</FluentCard>
+
+@code {
+    private readonly string outputUnix = "This is a\\ntest.";
+    private readonly string outputNonUnix = "This is a\\r\\ntest.";
+}
