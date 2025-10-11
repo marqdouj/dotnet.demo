@@ -1,4 +1,5 @@
 using Marqdouj.DotNet.Demo.Components;
+using Marqdouj.DotNet.Web.Components.Services;
 using Microsoft.FluentUI.AspNetCore.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +9,8 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddFluentUIComponents();
 builder.Services.AddHttpClient();
+
+builder.Services.AddScoped<IResizeObserverService, ResizeObserverService>();
 
 var app = builder.Build();
 

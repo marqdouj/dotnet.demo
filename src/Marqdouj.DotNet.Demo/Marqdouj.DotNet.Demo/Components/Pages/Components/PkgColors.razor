@@ -1,8 +1,8 @@
-﻿@page "/pkg-general-numbers"
+﻿@page "/pkg-components-colors"
 @rendermode InteractiveServer
 @inject IDialogService DialogService
 
-<PageTitle>@subject</PageTitle>
+<PageTitle>Components - Colors</PageTitle>
 
 <FluentLayout>
     <PkgPageHeader Header="@subject"
@@ -13,6 +13,7 @@
 </FluentLayout>
 
 @code {
-    private readonly string hRefCode = HRefCodeSource.General.CodeUrl("Extensions/Numbers.cs");
-    private readonly string subject = "Number Extensions";
+    private readonly string hRefCode = HRefCodeSource.Components.CodeUrl("Css");
+    private readonly string subject = "Colors";
+
 }
