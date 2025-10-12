@@ -2,18 +2,47 @@
 @rendermode InteractiveServer
 @inject IDialogService DialogService
 
-<PageTitle>Components - Colors</PageTitle>
+<PageTitle>Components - Html Colors</PageTitle>
 
 <FluentLayout>
     <PkgPageHeader Header="@subject"
                    HRefCode="@hRefCode"
-                   Subject="@subject" />
+                   Subject="@subject">
+        <Content>
+            <FluentStack Orientation="Orientation.Vertical">
+                <FluentLabel>
+                    <span class="colorinfo">HtmlColorName</span>.
+                    This is an Enum of the 140 basic colors.
+                </FluentLabel>
+                <FluentLabel>
+                    <span class="colorinfo">HtmlColorNameCollection</span>.
+                    This is a collection of view models <span class="colorinfo">(HtmlColorNameListItem)</span> for display purposes.
+                    This demo uses that collection to display the values in a grid.
+                </FluentLabel>
+            </FluentStack>
+        </Content>      
+    </PkgPageHeader>
 
-    <ComingSoon />
+    <div style="overflow:auto;height:100%">
+        <FluentDataGrid Items="@colors.Items.AsQueryable()">
+            <TemplateColumn Width="2rem">
+                <div style="@($"height:1rem;width:1rem;border: solid 1px black;background-color:{context?.Hex ?? "Transparent"};")" />
+            </TemplateColumn>
+            <PropertyColumn Property="@(p => p.Name)" Width="200px" />
+            <PropertyColumn Property="@(p => p.Hex)"  Width="150px"/>
+        </FluentDataGrid>
+    </div>
 </FluentLayout>
 
-@code {
-    private readonly string hRefCode = HRefCodeSource.Components.CodeUrl("Css");
-    private readonly string subject = "Colors";
+<style>
+    .colorinfo {
+        font-weight: 500;
+        color:blue;
+    }
+</style>
 
+@code {
+    private readonly string hRefCode = HRefCodeSource.Components.CodeUrl("Css/HtmlColorName.cs");
+    private readonly string subject = "Html Named Colors";
+    private readonly HtmlColorNameCollection colors = new();
 }
