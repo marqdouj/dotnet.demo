@@ -1,0 +1,51 @@
+﻿@inject IToastService ToastService
+
+<FluentCard>
+    <FluentLabel Typo="Typography.Header">string.ToNList()</FluentLabel>
+    <FluentLabel>
+        Converts a delimited string to a List of numbers.<br />       
+        Spaces and empty entries are acceptable.<br />
+        If you enter an invalid delimited string an exception will be thrown.
+    </FluentLabel>
+    <FluentLabel></FluentLabel>
+    <br />
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentLabel>Enter a value:</FluentLabel>
+
+        <FluentStack>
+            <FluentTextField @bind-Value=value></FluentTextField>
+            <FluentButton Appearance="Appearance.Accent" OnClick="Test">Test</FluentButton>
+        </FluentStack>
+
+        <FluentLabel>Output:</FluentLabel>
+        <ul>
+            @{
+                if (result != null)
+                {
+                    foreach (var item in result)
+                    {
+                        <li>@item.ToString()</li>
+                    }
+                }
+            }
+        </ul>
+    </FluentStack>
+</FluentCard>
+
+@code {
+    private string? value;
+    private List<double>? result;
+
+    private void Test()
+    {
+        try
+        {
+            result = value?.ToNList<double>();
+        }
+        catch (Exception ex)
+        {
+            result = null;
+            ToastService.Error(ex);
+        }
+    }
+}

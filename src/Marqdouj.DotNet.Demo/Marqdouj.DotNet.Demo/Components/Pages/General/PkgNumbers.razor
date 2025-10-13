@@ -1,6 +1,5 @@
 ﻿@page "/pkg-general-numbers"
 @rendermode InteractiveServer
-@inject IDialogService DialogService
 
 <PageTitle>@subject</PageTitle>
 
@@ -9,7 +8,14 @@
                    HRefCode="@hRefCode"
                    Subject="@subject" />
 
-    <ComingSoon />
+    <FluentGrid>
+        <FluentGridItem>
+            <PkgNList />
+        </FluentGridItem>
+        <FluentGridItem>
+            <PkgIsNumber/>
+        </FluentGridItem>
+    </FluentGrid>
 </FluentLayout>
 
 @code {

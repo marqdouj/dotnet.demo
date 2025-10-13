@@ -1,0 +1,39 @@
+﻿@inject IToastService ToastService
+
+<FluentCard>
+    <FluentLabel Typo="Typography.Header">object.IsNumberTypeCode(includeByte)</FluentLabel>
+    <FluentLabel>
+        Checks if the underlying type code is a number.<br />
+        TypeCodes: UInt16,UInt32,UInt64,Int16,Int32,Int64,Decimal,Double,Single, 
+        and Byte/SByte if includeByte = true.
+    </FluentLabel>
+    <FluentLabel></FluentLabel>
+    <br />
+    <FluentLabel>Examples:</FluentLabel>
+    <FluentGrid>
+        <FluentGridItem>
+            <FluentCard>
+                <FluentStack Orientation="Orientation.Vertical">
+                    <CodeText Text="@codeTrue" />
+                    <CodeText Text="var isNumber = value.IsNumberTypeCode();" />
+                    <FluentLabel>Output: true</FluentLabel>
+                </FluentStack>
+            </FluentCard>
+        </FluentGridItem>
+
+        <FluentGridItem>
+            <FluentCard>
+                <FluentStack Orientation="Orientation.Vertical">
+                    <CodeText Text="@codeFalse" />
+                    <CodeText Text="var isNumber = value.IsNumberTypeCode();" />
+                    <FluentLabel>Output: false</FluentLabel>
+                </FluentStack>
+            </FluentCard>
+        </FluentGridItem>
+    </FluentGrid>
+</FluentCard>
+
+@code {
+    private readonly string codeTrue = "object value = 1;";
+    private readonly string codeFalse = "object value = \"1\";";
+}
