@@ -2,7 +2,10 @@
 
 <FluentLayout>
     <FluentHeader>
-        Marqdouj.DotNet.Demo
+        <FluentStack VerticalAlignment="VerticalAlignment.Center">
+            <FluentPersona Image="https://avatars.githubusercontent.com/u/16510416" ImageSize="36px"/>
+            DotNet.Demo
+        </FluentStack>
     </FluentHeader>
     <FluentStack Class="main" Orientation="Orientation.Horizontal" Width="100%">
         <NavMenu />
@@ -13,9 +16,11 @@
         </FluentBodyContent>
     </FluentStack>
     <FluentFooter>
-        <a href="https://www.fluentui-blazor.net" target="_blank">Documentation and demos</a>
+        <a href="https://learn.microsoft.com/en-us/aspnet/core/blazor" target="_blank">Blazor</a>
         <FluentSpacer />
-        <a href="https://learn.microsoft.com/en-us/aspnet/core/blazor" target="_blank">About Blazor</a>
+        <a href="https://github.com/marqdouj/dotnet.demo" target="_blank">@copyright</a>
+        <FluentSpacer />
+        <a href="https://www.fluentui-blazor.net/" target="_blank">FluentUI</a>
     </FluentFooter>
 
     <FluentDialogProvider @rendermode="InteractiveServer" />
@@ -28,3 +33,7 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code {
+    private string copyright { get; } = $"© Douglas Marquardt {DateTime.Today.Year}";
+}
