@@ -1,5 +1,5 @@
 ﻿<code >
-    @Text
+    @ChildContent
 </code>
 
 <style>
@@ -13,6 +13,6 @@
 </style>
 
 @code {
-	[Parameter, EditorRequired]
-	public string Text { get; set; }
+	[Parameter]
+	public RenderFragment? ChildContent { get; set; }
 }
