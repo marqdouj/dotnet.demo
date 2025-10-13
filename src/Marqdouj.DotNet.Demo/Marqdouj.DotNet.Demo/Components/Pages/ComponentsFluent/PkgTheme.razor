@@ -20,7 +20,7 @@
             <FluentGridItem>
                 <FluentCard AreaRestricted="false">
                     <FluentLabel>Theme Switch (Toggle Light/Dark)</FluentLabel>
-                    <ThemeSwitch />
+                    <ThemeSwitch OfficeColor="@colorOptions.Color" />
                 </FluentCard>
             </FluentGridItem>
 
@@ -36,6 +36,5 @@
 @code {
     private readonly string hRefCode = HRefCodeSource.ComponentsFluent.CodeUrl("Themes");
     private readonly string subject = "Theme Controls";
-    private ThemeOptions modeOptions = new() { Label = "Theme Mode (System/Light/Dark)" };
     private ThemeOptions colorOptions = new() { Label = "Theme Color (Office Color)" };
 }
