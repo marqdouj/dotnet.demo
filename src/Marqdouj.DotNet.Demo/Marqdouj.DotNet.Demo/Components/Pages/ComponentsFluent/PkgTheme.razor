@@ -1,0 +1,47 @@
+﻿@page "/pkg-components-ui-theme"
+@rendermode InteractiveServer
+
+<PageTitle>Components (Fluent) - Theme Controls</PageTitle>
+
+<FluentLayout>
+    <PkgPageHeader Header="@subject"
+                   HRefCode="@hRefCode"
+                   Subject="@subject">
+        <Content>
+            <FluentLabel>
+                Please enusure you have configured your app for the FluenUI 
+                <a href="https://www.fluentui-blazor.net/DesignTheme" target="_blank">Design Theme</a>
+            </FluentLabel>
+        </Content>
+    </PkgPageHeader>
+
+    <FluentCard AreaRestricted="false">
+        <FluentGrid>
+            <FluentGridItem>
+                <FluentCard AreaRestricted="false">
+                    <FluentLabel>Theme Switch (Toggle Light/Dark)</FluentLabel>
+                    <ThemeSwitch />
+                </FluentCard>
+            </FluentGridItem>
+
+            <FluentGridItem>
+                <FluentCard AreaRestricted="false">
+                    <ThemeMode Options="modeOptions" />
+                </FluentCard>
+            </FluentGridItem>
+
+            <FluentGridItem>
+                <FluentCard AreaRestricted="false">
+                    <ThemeColor Options="colorOptions" />
+                </FluentCard>
+            </FluentGridItem>
+        </FluentGrid>
+    </FluentCard>
+</FluentLayout>
+
+@code {
+    private readonly string hRefCode = HRefCodeSource.ComponentsFluent.CodeUrl("Themes");
+    private readonly string subject = "Theme Controls";
+    private ThemeOptions modeOptions = new() { Label = "Theme Mode (System/Light/Dark)" };
+    private ThemeOptions colorOptions = new() { Label = "Theme Color (Office Color)" };
+}
