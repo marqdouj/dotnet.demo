@@ -1,7 +1,7 @@
-﻿@page "/pkg-components-ui-theme-switch"
+﻿@page "/pkg-components-ui-theme-toggle"
 @rendermode InteractiveServer
 
-<PageTitle>Components (Fluent) - Theme Switch</PageTitle>
+<PageTitle>Components (Fluent) - Theme Toggle</PageTitle>
 
 <FluentLayout>
     <PkgPageHeader Header="@subject"
@@ -14,12 +14,12 @@
     </PkgPageHeader>
 
     <FluentCard AreaRestricted="false" MinimalStyle="true">
-        <FluentLabel>Click on the button (component) to toggle the theme.</FluentLabel>
-        <ThemeSwitch />
+        <FluentLabel>Click on the button to toggle the theme.<br /><br /></FluentLabel>
+        <ThemeToggle />
     </FluentCard>
 </FluentLayout>
 
 @code {
-    private readonly string hRefCode = HRefCodeSource.ComponentsFluent.CodeUrl("Themes/ThemeSwitch.razor");
-    private readonly string subject = "Theme Switch";
+    private readonly string hRefCode = HRefCodeSource.ComponentsFluent.CodeUrl("Themes/ThemeToggle.razor");
+    private readonly string subject = "Theme Toggle";
 }
