@@ -1,9 +1,16 @@
 ﻿@page "/"
+@rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
 
 <FluentLayout>
-	<FluentHeader>Welcome!</FluentHeader>
+	<FluentHeader>
+		<FluentStack VerticalAlignment="VerticalAlignment.Center">
+			Welcome!
+			<FluentSpacer />
+			<ThemeSwitch />
+		</FluentStack>
+    </FluentHeader>
 
 	<ReadMeView Repository="@repo"/>
 </FluentLayout>

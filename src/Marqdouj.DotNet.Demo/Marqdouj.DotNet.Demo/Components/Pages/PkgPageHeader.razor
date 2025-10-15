@@ -9,7 +9,7 @@
         <FluentLabel Typo="Typography.Subject">
             This example demonstrates <span class="subject">@Subject</span>.
         </FluentLabel>
-        @Content
+        @ChildContent
         <FluentStack>
             <a href="@HRefCode" target="_blank">Source Code</a>
         </FluentStack>
@@ -33,7 +33,7 @@
     private string showHideNarrative => showNarrative ? "Hide Info" : "Show Info";
 
 	[Parameter]
-	public RenderFragment? Content { get; set; }
+	public RenderFragment? ChildContent { get; set; }
 
 	[Parameter, EditorRequired]
 	public string Header { get; set; }

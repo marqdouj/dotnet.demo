@@ -1,0 +1,37 @@
+﻿@page "/pkg-components-ui-theme-select"
+@rendermode InteractiveServer
+
+<PageTitle>Components (Fluent) - Theme Select</PageTitle>
+
+<FluentLayout>
+    <PkgPageHeader Header="@subject"
+                   HRefCode="@hRefCode"
+                   Subject="@subject">
+        <FluentLabel>
+            A combination of both ThemeMode and ThemeColor.
+            It supports either Horizontal or Vertical display.
+        </FluentLabel>
+    </PkgPageHeader>
+
+    <FluentCard AreaRestricted="false">
+        <FluentLabel>Alignment</FluentLabel>
+        <FluentSelect Items="@alignments"
+                      TOption="Option<string>"
+                      OptionText="@(i => i.Text)"
+                      OptionValue="@(i => i.Value)"
+                      Height="250px"
+                      Width="200px"
+                      @bind-Value="@alignment" />
+        <br />
+        <br />
+        <ThemeSelect Alignment="@themeSelectAligment"/>
+    </FluentCard>
+</FluentLayout>
+
+@code {
+    private readonly string hRefCode = HRefCodeSource.ComponentsFluent.CodeUrl("Themes/ThemeSelect.razor");
+    private readonly string subject = "Theme Select";
+    private List<Option<string>> alignments = UIExtensions.GetEnumLookup<ThemeSelectAligment>(false);
+    private string alignment = ThemeSelectAligment.Horizontal.ToString();
+    private ThemeSelectAligment themeSelectAligment => Enum.Parse<ThemeSelectAligment>(alignment);
+}

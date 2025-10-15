@@ -1,0 +1,24 @@
+﻿@page "/pkg-components-ui-theme-switch"
+@rendermode InteractiveServer
+
+<PageTitle>Components (Fluent) - Theme Switch</PageTitle>
+
+<FluentLayout>
+    <PkgPageHeader Header="@subject"
+                   HRefCode="@hRefCode"
+                   Subject="@subject">
+        <FluentLabel>
+            Component for toggling between light and dark themes.
+        </FluentLabel>
+    </PkgPageHeader>
+
+    <FluentCard AreaRestricted="false">
+        <FluentLabel>Click on the button (component) to toggle the theme.</FluentLabel>
+        <ThemeSwitch />
+    </FluentCard>
+</FluentLayout>
+
+@code {
+    private readonly string hRefCode = HRefCodeSource.ComponentsFluent.CodeUrl("Themes/ThemeSwitch.razor");
+    private readonly string subject = "Theme Switch";
+}

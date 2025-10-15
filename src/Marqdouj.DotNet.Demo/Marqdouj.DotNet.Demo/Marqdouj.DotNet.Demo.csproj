@@ -11,7 +11,7 @@
     <PackageReference Include="Markdig" Version="0.42.0" />
     <PackageReference Include="Marqdouj.DotNet.General" Version="10.0.0-Preview3.1" />
     <PackageReference Include="Marqdouj.DotNet.Web.Components" Version="10.0.0-Preview" />
-	<PackageReference Include="Marqdouj.DotNet.Web.Components.FluentUI" Version="10.0.0-Preview2.2" />
+	<PackageReference Include="Marqdouj.DotNet.Web.Components.FluentUI" Version="10.0.0-Preview4.1" />
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.13.0" />
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.13.0" />
   </ItemGroup>
