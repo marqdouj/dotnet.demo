@@ -1,4 +1,5 @@
 using Marqdouj.DotNet.Demo.Components;
+using Marqdouj.DotNet.Web.Components.Geolocation;
 using Marqdouj.DotNet.Web.Components.Services;
 using Microsoft.FluentUI.AspNetCore.Components;
 
@@ -11,6 +12,8 @@ builder.Services.AddRazorComponents()
 builder.Services.AddHttpClient();
 builder.Services.AddFluentUIComponents();
 
+builder.Services.AddJSLoggerService();
+builder.Services.AddScoped<IGeolocationService, GeolocationService>();
 builder.Services.AddScoped<IResizeObserverService, ResizeObserverService>();
 
 var app = builder.Build();
