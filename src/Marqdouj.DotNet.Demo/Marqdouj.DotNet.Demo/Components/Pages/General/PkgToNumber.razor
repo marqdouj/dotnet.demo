@@ -1,0 +1,39 @@
+﻿<FluentCard>
+	<FluentLabel Typo="Typography.Header">@headerText</FluentLabel>
+	<CodeText>@codeText</CodeText>
+	<FluentLabel>
+		Converts a string to to a number.<br />
+		If the string can't be converted, default(T) will be returned unless a default value is provided.
+	</FluentLabel>
+
+    <FluentStack>
+        <div>
+            <p>Value:</p>
+            <FluentTextField @bind-Value=value></FluentTextField>
+        </div>
+        <div>
+            <p>Default:</p>
+            <FluentNumberField @bind-Value=defValue Style="width:5rem;"></FluentNumberField>
+        </div>
+    </FluentStack>
+
+    <FluentButton Appearance="Appearance.Accent" OnClick="Test">Test</FluentButton>
+
+    <FluentStack>
+        <p>Converted Value:</p>
+        <FluentLabel Style="background-color:#f1f1f1" Typo="Typography.Body">@convertedValue</FluentLabel>
+    </FluentStack>
+</FluentCard>
+
+@code {
+    private readonly string codeText = "var number = myString.ToNumber<double>()";
+    private readonly string headerText = "string.ToNumber<T>()";
+    private string? value;
+    private double? defValue = -999;
+    private string? convertedValue;
+
+    private void Test()
+    {
+        convertedValue = value.ToNumber<double>(defValue ?? default).ToString();
+    }
+}
