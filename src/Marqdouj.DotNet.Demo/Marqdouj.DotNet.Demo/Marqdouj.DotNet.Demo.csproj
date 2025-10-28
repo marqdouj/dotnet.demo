@@ -8,10 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Markdig" Version="0.42.0" />
+    <PackageReference Include="Markdig" Version="0.43.0" />
     <PackageReference Include="Marqdouj.DotNet.General" Version="10.0.0-Preview4.0" />
     <PackageReference Include="Marqdouj.DotNet.Web.Components" Version="10.0.0-Preview-3.0" />
-	<PackageReference Include="Marqdouj.DotNet.Web.Components.FluentUI" Version="10.0.0-Preview8.0" />
+	<PackageReference Include="Marqdouj.DotNet.Web.Components.FluentUI" Version="10.0.0-rc-1.1" />
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.13.0" />
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.13.0" />
   </ItemGroup>
