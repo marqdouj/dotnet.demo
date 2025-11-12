@@ -1,0 +1,78 @@
+﻿@using Marqdouj.DotNet.AzureMaps.Map.Interop.Layers
+<FluentHeader Style="margin-bottom:5px;">
+    @Header
+    <FluentSpacer Width="10" />
+    <FluentCheckbox @bind-Value:get="@ShowNarrative" @bind-Value:set="@OnValueChanged">@showHideNarrative</FluentCheckbox>
+</FluentHeader>
+
+<FluentCard MinimalStyle="true" Height="auto" Style="margin-bottom:5px;">
+    <FluentStack Orientation="Orientation.Vertical">
+        <div class="@narrativeClass">
+            @ChildContent
+        </div>
+        <FluentStack>
+            @{
+                if (!string.IsNullOrWhiteSpace(HRefSource))
+                {
+                    <a href="@HRefSource" target="_blank">@HRefSourceLabel</a>
+                }
+            }
+            @{
+                if (!string.IsNullOrWhiteSpace(hRefExample))
+                {
+                    <a href="@hRefExample" target="_blank">@hRefExampleLabel</a>
+                }
+            }
+            @{
+                if (!string.IsNullOrWhiteSpace(hRefDocs))
+                {
+                    <a href="@hRefDocs" target="_blank">@HRefDocsLabel</a>
+                }
+            }
+        </FluentStack>
+    </FluentStack>
+</FluentCard>
+
+<style>
+    .hidden {
+        display: none;
+    }
+</style>
+
+@code {
+    private string narrativeClass => ShowNarrative ? "" : "hidden";
+    private string showHideNarrative => ShowNarrative ? "Hide Info" : "Show Info";
+    private string? hRefDocs => LayerDef.ToHRefAzureDocs();
+    private string? hRefExample => LayerDef?.ToHRefAddLayerExample();
+    private string hRefExampleLabel => $"{LayerDef?.Type} Layer Example";
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter, EditorRequired]
+    public string Header { get; set; }
+
+    [Parameter]
+    public string? HRefSource { get; set; }
+
+    [Parameter]
+    public string? HRefSourceLabel { get; set; } = "Page Source";
+
+    [Parameter]
+    public string? HRefDocsLabel { get; set; } = "Azure SDK Docs";
+
+    [Parameter, EditorRequired]
+    public MapLayerDef? LayerDef { get; set; }
+
+    [Parameter]
+    public bool ShowNarrative { get; set; } = true;
+
+    [Parameter]
+    public EventCallback<bool> ShowNarrativeChanged { get; set; }
+
+    private async Task OnValueChanged(bool value)
+    {
+        ShowNarrative = value;
+        await ShowNarrativeChanged.InvokeAsync(value);
+    }
+}

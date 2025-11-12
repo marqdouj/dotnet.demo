@@ -12,6 +12,11 @@
     <!-- Set the default theme -->
     <script src="_content/Microsoft.FluentUI.AspNetCore.Components/js/loading-theme.js" type="text/javascript"></script>
     <loading-theme storage-name="theme"></loading-theme>
+
+    @* Azure Maps SDK *@
+    <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.css" type="text/css">
+    <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.js"></script>
+
     <ImportMap />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <HeadOutlet />
@@ -21,6 +26,21 @@
     <Routes />
     <ReconnectModal />
     <script src="_framework/blazor.web.js"></script>
+
+    @* Add the script for Marqdouj.DotNet.AzureMaps *@
+    <script src="./_content/Marqdouj.DotNet.AzureMaps/marqdouj-azuremaps.js"></script>
+
+    @* Add the script required for Anonymous authentication (if applicable) *@
+    @* <script type="text/javascript">
+        marqdoujAzureMaps.MapFactory.getAuthTokenCallback = (resolve, reject, map) => {
+            DotNet.invokeMethodAsync('Sandbox', 'GetAccessToken')
+            .then(function (response) {
+                return response;
+            }).then(function (token) {
+                resolve(token);
+            });
+        };
+    </script> *@
 </body>
 
 </html>
