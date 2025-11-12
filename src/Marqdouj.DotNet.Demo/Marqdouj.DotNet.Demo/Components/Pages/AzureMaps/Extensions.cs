@@ -48,7 +48,7 @@ namespace Marqdouj.DotNet.Demo.Components.Pages.AzureMaps
             return hRef;
         }
 
-        public static string ToPageSource(this string name) => HRefSource.DemoApp.CodeUrl($"{name}.razor");
+        public static string ToPageSource(this string name) => HRefSource.DemoApp.CodeUrl($"AzureMaps/{name}.razor");
 
         public static string CodeUrl(this HRefSource source, string path)
         {
@@ -56,7 +56,7 @@ namespace Marqdouj.DotNet.Demo.Components.Pages.AzureMaps
             {
                 HRefSource.AzureDocs => "https://learn.microsoft.com/en-us/azure/azure-maps",
                 HRefSource.Examples => "https://github.com/marqdouj/dotnet.azuremaps/blob/master/docs/examples/",
-                HRefSource.DemoApp => "https://github.com/marqdouj/dotnet.azuremaps.ui/blob/master/src/Marqdouj.DotNet.AzureMaps.UI/Marqdouj.DotNet.AzureMaps.UI/Components/Pages/Maps",
+                HRefSource.DemoApp => "https://github.com/marqdouj/dotnet.demo/blob/master/src/Marqdouj.DotNet.Demo/Marqdouj.DotNet.Demo/Components/Pages/",
                 _ => throw new NotImplementedException(),
             };
             return Path.Combine(url, path);
