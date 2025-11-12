@@ -29,7 +29,11 @@
 			<FluentLabel>
 				This example demonstrates the basic Azure Map layers and the 
 				<a href="https://www.nuget.org/packages/Marqdouj.DotNet.AzureMaps.UI" target="_blank">UI Companion library</a> NuGet package.
+				<br />
+				NOTE: The companion UI library is not required to use the Azure Maps package.
 			</FluentLabel>
+			<FluentCheckbox @bind-Value="@useUI">Use Companion UI Library</FluentCheckbox>
+			<br />
 			<br />
 			The map is initialized to a specific camera position (Seattle, WA), with some common map controls.
 			<br />
@@ -94,6 +98,7 @@
 	private bool disabled => overlay || mapInterop == null;
 	private bool isSymbolLayer => layerDef != null && layerDef.Type == MapLayerType.Symbol;
 	private bool isSymbolLayerDisabled => disabled || !isSymbolLayer;
+	private bool useUI = true;
 
 	private async Task OnMapEventReady(MapEventArgs e)
 	{
@@ -116,14 +121,18 @@
 			if (mapInterop == null) return;
 
 			var uiLayerDef = layerDef?.Type == layerType ? layerDef.GetClone() : await layerType.GetDefaultLayerDef(DataService);
-			var uiModel = uiLayerDef.GetLayerDefUIModel(XmlService);
-			var inputs = uiModel.GetInputs();
-			var parameters = MapHelpers.GetDefaultDialogParameters($"{layerType} Layer Settings");
-			IDialogReference dialog = await DialogService.ShowDialogAsync<UILayerDefInputDialog>(inputs, parameters);
-			DialogResult? result = await dialog.Result;
 
-			if (result.Cancelled)
-				return;
+			if (useUI)
+			{
+				var uiModel = uiLayerDef.GetLayerDefUIModel(XmlService);
+				var inputs = uiModel.GetInputs();
+				var parameters = MapHelpers.GetDefaultDialogParameters($"{layerType} Layer Settings");
+				IDialogReference dialog = await DialogService.ShowDialogAsync<UILayerDefInputDialog>(inputs, parameters);
+				DialogResult? result = await dialog.Result;
+
+				if (result.Cancelled)
+					return;
+			}
 
 			overlay = true;
 
