@@ -1,8 +1,5 @@
 # DotNet.Demo
 
-> NOTE: This repository is currenly under construction
-and all packages are in Preview.
-
 ## Summary
 This repository demontrates the use of my `DotNet` NuGet packages.
 
