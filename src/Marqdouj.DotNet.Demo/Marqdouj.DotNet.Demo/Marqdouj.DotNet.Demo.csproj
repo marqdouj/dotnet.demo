@@ -24,4 +24,8 @@
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.13.1" />
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.13.1" />
   </ItemGroup>
+	
+  <ItemGroup>
+    <ProjectReference Include="..\Marqdouj.DotNet.Demo.CustomMaps\Marqdouj.DotNet.Demo.CustomMaps.csproj" />
+  </ItemGroup>
 </Project>
