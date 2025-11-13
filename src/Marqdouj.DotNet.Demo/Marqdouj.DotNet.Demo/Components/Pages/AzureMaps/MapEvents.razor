@@ -18,7 +18,7 @@
 <PageTitle>Map Events</PageTitle>
 
 <FluentLayout>
-    <MapPageHeader Header="@header" LayerDef="@layerDef" HRefSource="@hRefSource">
+    <MapPageHeader Header="@header" LayerDef="@null" HRefSource="@hRefSource">
         <FluentLabel>
             This example demonstrates subscribing to the Click, MouseMove, and MouseOut map events.
             <br />
@@ -84,7 +84,6 @@
     private MapOptions options = MapHelpers.GetDefaultMapOptions(10);
     private MapInterop? mapInterop;
     private bool disabled => overlay || mapInterop == null;
-    private MapLayerDef? layerDef;
     private readonly EnumList<MapEventType> mapEvents = new();
     private readonly MouseDisplay mouseDisplay = new();
     private bool notificationsEnabled = true;
@@ -121,8 +120,8 @@
         {
             if (mapInterop == null) return;
 
-            var uiLayerDef = await MapLayerType.Symbol.GetDefaultLayerDef(DataService);
-            layerDef = await mapInterop.AddBasicMapLayer(DataService, uiLayerDef);
+            var layerDef = await MapLayerType.Symbol.GetDefaultLayerDef(DataService);
+            layerDef = await mapInterop.AddBasicMapLayer(DataService, layerDef);
         }
         catch (Exception ex)
         {
