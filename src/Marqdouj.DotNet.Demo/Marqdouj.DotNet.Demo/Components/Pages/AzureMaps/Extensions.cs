@@ -15,6 +15,7 @@ namespace Marqdouj.DotNet.Demo.Components.Pages.AzureMaps
         AzureDocs,
         Examples,
         DemoApp,
+        DemoMaps,
     }
 
     internal static class HRefExtensions
@@ -57,6 +58,7 @@ namespace Marqdouj.DotNet.Demo.Components.Pages.AzureMaps
                 HRefSource.AzureDocs => "https://learn.microsoft.com/en-us/azure/azure-maps",
                 HRefSource.Examples => "https://github.com/marqdouj/dotnet.azuremaps/blob/master/docs/examples/",
                 HRefSource.DemoApp => "https://github.com/marqdouj/dotnet.demo/blob/master/src/Marqdouj.DotNet.Demo/Marqdouj.DotNet.Demo/Components/Pages/",
+                HRefSource.DemoMaps => "https://github.com/marqdouj/dotnet.demo/blob/master/src/Marqdouj.DotNet.Demo/Marqdouj.DotNet.Demo.CustomMaps/",
                 _ => throw new NotImplementedException(),
             };
             return Path.Combine(url, path);

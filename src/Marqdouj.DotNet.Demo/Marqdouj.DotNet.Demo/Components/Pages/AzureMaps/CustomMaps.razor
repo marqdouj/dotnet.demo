@@ -18,6 +18,9 @@
             This example demonstrates how add custom functionality to the Azure Map created using the 
             <a href="https://www.nuget.org/packages/Marqdouj.DotNet.AzureMaps" target="_blank">Marqdouj.DotNet.AzureMaps</a> library in a Blazor application.
             <br />
+            <a href="@hRefCustomMaps" target="_blank">CustomMaps Source</a>
+            <br />
+            <br />
             The map is initialized to a specific camera position (Seattle, WA), with no map controls.
             <br />
             Use the "Reset Map" button to reset the map to its initial state.
@@ -52,6 +55,7 @@
 @code {
     private const string MapId = "customMap"; // This is optional.
     private string hRefSource => nameof(CustomMaps).ToPageSource();
+    private string hRefCustomMaps => HRefSource.DemoMaps.CodeUrl("DemoCustomMaps.cs");
     private readonly string header = "Custom Map (JS Interop)";
     private string mapHeight = "400px";
     private string mapWidth = "100%";
