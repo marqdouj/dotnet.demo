@@ -1,0 +1,24 @@
+﻿@page "/pkg-azure-maps"
+
+<PageTitle>Azure Maps</PageTitle>
+
+<FluentLayout>
+	<FluentHeader>@repo</FluentHeader>
+
+	<FluentTabs Height="90%">
+		<FluentTab Label="Azure Maps">
+			<ReadMeView Repository="@repo" Height="@height" />
+		</FluentTab>
+
+		<FluentTab Label="Azure Maps UI">
+			<ReadMeView Repository="@repoUI" Height="@height" />
+		</FluentTab>
+	</FluentTabs>
+	
+</FluentLayout>
+
+@code {
+	private readonly string repo = "dotnet.azuremaps";
+	private readonly string repoUI = "dotnet.azuremaps.ui";
+	private readonly string height = "600px";
+}

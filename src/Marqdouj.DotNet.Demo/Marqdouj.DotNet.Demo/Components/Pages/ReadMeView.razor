@@ -1,7 +1,7 @@
 ﻿@using Markdig
 @inject HttpClient Http
 
-<FluentCard MinimalStyle="true" Style="height:90%">
+<FluentCard MinimalStyle="true" Style="@height">
     <div class="markdown-body" style="overflow-y:auto;height:100%;width:100%;padding:10px;">
         @((MarkupString)htmlContent)
     </div>
@@ -10,6 +10,10 @@
 @code {
     private string htmlContent = "";
     private string projectUrl => $"https://github.com/marqdouj/{Repository}";
+    private string height => string.IsNullOrWhiteSpace(Height) ? "height:90%" : $"height:{Height}";
+
+    [Parameter]
+    public string? Height { get; set; }
 
     [Parameter, EditorRequired] public string Repository { get; set; } = string.Empty;
 
