@@ -1,5 +1,5 @@
 using Marqdouj.DotNet.AzureMaps.UI.Services;
-using Marqdouj.DotNet.Demo.AzureMaps;
+using Marqdouj.DotNet.Demo.Shared.AzureMaps;
 using Marqdouj.DotNet.Demo.Components;
 using Marqdouj.DotNet.Web.Components.Geolocation;
 using Marqdouj.DotNet.Web.Components.Services;

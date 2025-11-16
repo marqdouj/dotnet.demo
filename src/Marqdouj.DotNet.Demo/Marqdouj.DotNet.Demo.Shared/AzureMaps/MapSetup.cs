@@ -3,8 +3,10 @@
 using Marqdouj.DotNet.AzureMaps;
 using Marqdouj.DotNet.AzureMaps.Map;
 using Marqdouj.DotNet.AzureMaps.Map.Options;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Marqdouj.DotNet.Demo.AzureMaps
+namespace Marqdouj.DotNet.Demo.Shared.AzureMaps
 {
     public static class MapSetup
     {

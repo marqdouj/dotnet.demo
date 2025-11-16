@@ -5,7 +5,7 @@ using Marqdouj.DotNet.AzureMaps.Map.Interop.Features;
 using Marqdouj.DotNet.AzureMaps.Map.Interop.Layers;
 using Marqdouj.DotNet.AzureMaps.UI.Models.Input;
 using Marqdouj.DotNet.AzureMaps.UI.Models.Maps;
-using Marqdouj.DotNet.Demo.AzureMaps;
+using Marqdouj.DotNet.Demo.Shared.AzureMaps;
 using Marqdouj.DotNet.Web.Components.Css;
 
 namespace Marqdouj.DotNet.Demo.Components.Pages.AzureMaps

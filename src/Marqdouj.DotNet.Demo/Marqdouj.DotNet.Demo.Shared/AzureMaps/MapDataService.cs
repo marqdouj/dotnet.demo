@@ -1,7 +1,7 @@
 ﻿using Marqdouj.DotNet.AzureMaps.Map.GeoJson;
 using Marqdouj.DotNet.AzureMaps.Map.Interop.Layers;
 
-namespace Marqdouj.DotNet.Demo.AzureMaps
+namespace Marqdouj.DotNet.Demo.Shared.AzureMaps
 {
     public interface IMapDataService
     {
@@ -18,7 +18,7 @@ namespace Marqdouj.DotNet.Demo.AzureMaps
     /// <summary>
     /// Simulates getting data from an API.
     /// </summary>
-    internal class MapDataService : IMapDataService
+    public class MapDataService : IMapDataService
     {
         public async Task<List<Position>> GetBubbleLayerData()
         {
