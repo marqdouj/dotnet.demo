@@ -27,5 +27,6 @@
 	
   <ItemGroup>
     <ProjectReference Include="..\Marqdouj.DotNet.Demo.CustomMaps\Marqdouj.DotNet.Demo.CustomMaps.csproj" />
+    <ProjectReference Include="..\Marqdouj.DotNet.Demo.Shared\Marqdouj.DotNet.Demo.Shared.csproj" />
   </ItemGroup>
 </Project>

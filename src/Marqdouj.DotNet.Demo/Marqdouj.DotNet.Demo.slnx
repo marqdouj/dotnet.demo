@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="Marqdouj.DotNet.Demo.CustomMaps/Marqdouj.DotNet.Demo.CustomMaps.csproj" Id="b88e41e7-09ce-4833-a402-4656ec087e9b" />
+  <Project Path="Marqdouj.DotNet.Demo.Shared/Marqdouj.DotNet.Demo.Shared.csproj" Id="0ee74197-691e-4999-b9d0-50f0ad413930" />
   <Project Path="Marqdouj.DotNet.Demo/Marqdouj.DotNet.Demo.csproj" />
 </Solution>

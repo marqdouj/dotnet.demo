@@ -145,7 +145,7 @@ namespace Marqdouj.DotNet.Demo.AzureMaps
 
     public class ImageLayerData()
     {
-        public string Url { get; } = "newark_nj_1922.jpg";
+        public string Url { get; } = "_content/Marqdouj.DotNet.Demo.Shared/newark_nj_1922.jpg";
 
         public ImageCoordinates Coordinates { get; set; } =
             [
