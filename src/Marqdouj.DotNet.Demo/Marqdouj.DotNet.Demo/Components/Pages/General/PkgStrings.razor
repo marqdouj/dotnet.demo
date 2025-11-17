@@ -1,21 +1,4 @@
 ﻿@page "/pkg-general-strings"
 @rendermode InteractiveServer
 
-<PageTitle>@subject</PageTitle>
-
-<FluentLayout>
-    <PkgPageHeader Header="@subject"
-                   HRefCode="@hRefCode"
-                   Subject="@subject" />
-
-    <FluentGrid>
-        <FluentGridItem>
-            <PkgTruncate/>
-        </FluentGridItem>
-    </FluentGrid>
-</FluentLayout>
-
-@code {
-    private readonly string hRefCode = HRefCodeSource.General.CodeUrl("Extensions/Strings.cs");
-    private readonly string subject = "String Extensions";
-}
+<PkgStringsS/>

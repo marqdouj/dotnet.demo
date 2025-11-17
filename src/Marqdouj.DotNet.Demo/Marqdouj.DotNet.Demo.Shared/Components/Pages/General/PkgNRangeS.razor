@@ -1,0 +1,25 @@
+﻿@using Marqdouj.DotNet.General
+<PageTitle>@subject</PageTitle>
+
+<FluentLayout>
+    <PkgPageHeader Header="@subject"
+                   HRefCode="@hRefCode"
+                   Subject="@subject">
+        <FluentLabel>A numeric range that constrains a number within minimum and maximum values</FluentLabel>
+    </PkgPageHeader>
+
+    <FluentCard>
+        <FluentLabel>Opacity (Min:0 Max:1)</FluentLabel>
+        <FluentStack Orientation="Orientation.Vertical">
+            <FluentTextField @bind-Value="@range.StringValue" TextFieldType="TextFieldType.Number" Style="width:150px;" />
+            <FluentSlider @bind-Value="@range.Value" Min="@range.Min" Max="@range.Max" Step="@range.Step" Style="width:150px;" />
+        </FluentStack>
+        <FluentLabel>Actual Value: @range.Value.ToString()</FluentLabel>
+    </FluentCard>
+</FluentLayout>
+
+@code {
+    private readonly string hRefCode = HRefRepository.General.GitHubSrcItem(null, "NRange.cs");
+    private readonly string subject = "NRange";
+    private readonly NRange<double> range = new(0, 1, 1){ Step = 0.01 };
+}
