@@ -32,9 +32,28 @@
 
         private static string GitHubTreeSrc(this HRefRepository repository) => Path.Combine(repository.GitHub(), "tree/master/src");
 
+        private static string GitHubRepositoryFolder(this HRefRepository repository)
+        {
+            var folder = repository switch
+            {
+                HRefRepository.ComponentsFluentUI => "FluentUI",
+                _ => $"{repository.Name(true)}",
+            };
+
+            return folder;
+        }
+
+        public static string GitHubSrcFolder(this HRefRepository repository, string? projectName = null, string path = "")
+        {
+            var url = repository.GitHubTreeSrc();
+            var folder = repository.GitHubRepositoryFolder();
+
+            return Path.Combine(url, folder, projectName ?? repository.Name(true), path);
+        }
+
         public static string GitHubSrcItem(this HRefRepository repository, string? projectName = null, string path = "")
         {
-            var url = string.IsNullOrWhiteSpace(path) ? repository.GitHubTreeSrc() : repository.GitHubBlobSrc();
+            var url = repository.GitHubBlobSrc();
             var folder = repository switch
             {
                 HRefRepository.ComponentsFluentUI => "FluentUI",

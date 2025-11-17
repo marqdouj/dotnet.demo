@@ -1,7 +1,7 @@
 ﻿using Marqdouj.DotNet.Web.Components.Css;
 using Marqdouj.DotNet.Web.Components.UI;
 
-namespace Marqdouj.DotNet.Demo.Components.Pages.ComponentsFluent
+namespace Marqdouj.DotNet.Demo.Shared.Components.Pages.ComponentsFluent
 {
     public enum PkgInputAlignment
     {
