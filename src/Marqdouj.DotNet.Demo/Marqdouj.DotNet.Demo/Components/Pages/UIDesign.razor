@@ -5,7 +5,7 @@
 @foreach (var item in Enum.GetValues<HRefRepository>())
 {
     <FluentStack>
-        <a href="@item.GitHubSrcFolder()" , target="_blank">@item</a>
+        <a href="@item.GitHubSrcItem()" , target="_blank">@item</a>
         <a href="@item.ReadMe()" , target="_blank">Read Me</a>
     </FluentStack>
     

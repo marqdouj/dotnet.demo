@@ -1,0 +1,51 @@
+﻿@using Marqdouj.DotNet.Web.Components.Css
+
+<PageTitle>Components - Html Colors</PageTitle>
+
+<FluentLayout>
+    <PkgPageHeader Header="@subject"
+                   HRefCode="@hRefCode"
+                   Subject="@subject">
+        <FluentStack Orientation="Orientation.Vertical">
+            <FluentLabel>
+                <span class="colorinfo">HtmlColorName</span>.
+                This is an Enum of the 140 basic colors.
+            </FluentLabel>
+            <FluentLabel>
+                <span class="colorinfo">HtmlColorNameCollection</span>.
+                This is a collection of view models <span class="colorinfo">(HtmlColorNameListItem)</span> for display purposes.
+                This demo uses that collection to display the values in a grid.
+            </FluentLabel>
+            <FluentLabel>
+                <span class="note">NOTE:</span>
+                FluenUI implementation is here <a href="/pkg-components-ui-input">UIColor</a>
+            </FluentLabel>
+        </FluentStack>
+    </PkgPageHeader>
+
+    <div style="overflow:auto;height:100%">
+        <FluentDataGrid Items="@colors.Items.AsQueryable()">
+            <TemplateColumn Width="2rem">
+                <div style="@($"height:1rem;width:1rem;border: solid 1px black;background-color:{context?.Hex ?? "Transparent"};")" />
+            </TemplateColumn>
+            <PropertyColumn Property="@(p => p.Name)" Width="200px" />
+            <PropertyColumn Property="@(p => p.Hex)"  Width="150px"/>
+        </FluentDataGrid>
+    </div>
+</FluentLayout>
+
+<style>
+    .colorinfo {
+        font-weight: 500;
+        color:blue;
+    }
+    .note{
+        font-weight: 500;
+    }
+</style>
+
+@code {
+    private readonly string hRefCode = HRefRepository.Components.GitHubSrcItem(null, "Css/HtmlColorName.cs");
+    private readonly string subject = "Html Named Colors";
+    private readonly HtmlColorNameCollection colors = new();
+}

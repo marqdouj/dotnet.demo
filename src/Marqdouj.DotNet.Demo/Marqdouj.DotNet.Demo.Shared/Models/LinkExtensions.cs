@@ -30,7 +30,7 @@
 
         private static string GitHubSrc(this HRefRepository repository) => Path.Combine(repository.GitHub(), "tree/master/src");
 
-        public static string GitHubSrcFolder(this HRefRepository repository, string? projectName = null)
+        public static string GitHubSrcItem(this HRefRepository repository, string? projectName = null, string path = "")
         {
             var url = repository.GitHubSrc();
             var folder = repository switch
@@ -39,7 +39,7 @@
                 _ => $"{repository.Name(true)}",
             };
 
-            return Path.Combine(url, folder, projectName ?? repository.Name(true));
+            return Path.Combine(url, folder, projectName ?? repository.Name(true), path);
         }
 
         public static string ReadMe(this HRefRepository repository)

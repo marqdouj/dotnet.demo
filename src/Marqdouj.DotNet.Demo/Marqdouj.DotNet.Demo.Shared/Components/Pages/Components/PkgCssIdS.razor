@@ -1,0 +1,61 @@
+﻿@using Marqdouj.DotNet.Web.Components.Css
+@using Marqdouj.DotNet.Web.Components.FluentUI.Extensions
+@inject IToastService ToastService
+
+<PageTitle>Components - Css Id</PageTitle>
+
+<FluentLayout>
+    <PkgPageHeader Header="@subject"
+                   HRefCode="@hRefCode"
+                   Subject="@subject" />
+
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentLabel Typo="Typography.Header">Guid.ToCssId()</FluentLabel>
+        <FluentLabel>Converts a Guid to a valid Css Identifier</FluentLabel>
+
+        <FluentCard MinimalStyle="true">
+            <FluentLabel>Code Examples:</FluentLabel>
+            <FluentStack Orientation="Orientation.Vertical">
+                <CodeText>@codeTextA</CodeText>
+                <CodeText>@codeTextB</CodeText>
+                <CodeText>@codeTextC</CodeText>
+            </FluentStack>
+        </FluentCard>
+
+        <FluentCard>
+            <FluentStack VerticalAlignment="VerticalAlignment.Center">
+                <FluentLabel>Prefix:</FluentLabel>
+                <FluentTextField @bind-Value=prefix></FluentTextField>
+                <FluentButton Appearance="Appearance.Accent" @onclick="CreateCssId">Test</FluentButton>
+            </FluentStack>
+            <FluentLabel Typo="Typography.H6">Output:</FluentLabel>
+            <FluentLabel>@result</FluentLabel>
+        </FluentCard>
+    </FluentStack>
+</FluentLayout>
+
+@code {
+    private readonly string hRefCode = HRefRepository.Components.GitHubSrcItem(null, "Css/CssExtensions.cs");
+    private readonly string subject = "Css Id";
+    private readonly string codeTextA = "var id = Guid.Empty.ToCssId();";
+    private readonly string codeTextB = "var id = Guid.NewGuid().ToCssId();";
+    private readonly string codeTextC = "var id = myGuid.ToCssId();";
+    private string prefix = "";
+    private string? result;
+
+    private void CreateCssId()
+    {
+        try
+        {
+            result = "";
+            if (string.IsNullOrWhiteSpace(prefix))
+                result = Guid.NewGuid().ToCssId();
+            else
+                result = Guid.NewGuid().ToCssId(prefix);
+        }
+        catch (Exception ex)
+        {
+            ToastService.Error(ex);
+        }
+    }
+}

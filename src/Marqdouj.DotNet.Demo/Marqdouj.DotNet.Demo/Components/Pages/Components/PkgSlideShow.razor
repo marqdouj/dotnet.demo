@@ -1,30 +1,4 @@
 ﻿@page "/pkg-components-slideshow"
 @rendermode InteractiveServer
 
-<PageTitle>Components - Slide Show</PageTitle>
-
-<FluentLayout>
-    <PkgPageHeader Header="@subject"
-                   HRefCode="@hRefCode"
-                   Subject="@subject" />
-
-    <FluentStack Orientation="Orientation.Vertical">
-        <div>
-            <SlideShow Images="@images" Width="400" Height="200" AutoSlideSeconds="3" />
-        </div>
-    </FluentStack>
-</FluentLayout>
-
-@code {
-    private readonly string hRefCode = HRefCodeSource.Components.CodeUrl("SlideShow.razor");
-    private readonly string subject = "Slide Show";
-    private readonly List<SlideshowImage> images = new();
-
-    protected override void OnInitialized()
-    {
-        for (int i = 1; i < 7; i++)
-        {
-            images.Add(new SlideshowImage(i, $"_content/Marqdouj.DotNet.Demo.Shared/banner/Banner{i}.png", $"Image #{i}"));
-        }
-    }
-}
+<PkgSlideShowS/>
