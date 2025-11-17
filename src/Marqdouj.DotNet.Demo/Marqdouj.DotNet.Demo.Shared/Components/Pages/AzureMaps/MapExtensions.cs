@@ -40,8 +40,8 @@ namespace Marqdouj.DotNet.Demo.Shared.Components.Pages.AzureMaps
             return hRef;
         }
 
-        public static string ToMapPageSource(this string name) => HRefRepository.Demo.GitHubSrcItem($"Marqdouj.DotNet.Demo.Shared.Components.Pages.AzureMaps/{name}.razor");
-        public static string ToMapCustomSource(this string name) => HRefRepository.Demo.GitHubSrcItem($"Marqdouj.DotNet.Demo.CustomMaps/{name}");
+        public static string ToMapPageSource(this string name) => HRefRepository.Demo.GitHubSrcItem("Marqdouj.DotNet.Demo.Shared", $"Components/Pages/AzureMaps/{name}.razor");
+        public static string ToMapCustomSource(this string name) => HRefRepository.Demo.GitHubSrcItem("Marqdouj.DotNet.Demo.CustomMaps", name);
 
         public static string CodeUrl(this HRefSource source, string path)
         {

@@ -28,11 +28,13 @@
 
         private static string GitHubContent(this HRefRepository repository) => Path.Combine(githubContent, repository.Name());
 
-        private static string GitHubSrc(this HRefRepository repository) => Path.Combine(repository.GitHub(), "tree/master/src");
+        private static string GitHubBlobSrc(this HRefRepository repository) => Path.Combine(repository.GitHub(), "blob/master/src");
+
+        private static string GitHubTreeSrc(this HRefRepository repository) => Path.Combine(repository.GitHub(), "tree/master/src");
 
         public static string GitHubSrcItem(this HRefRepository repository, string? projectName = null, string path = "")
         {
-            var url = repository.GitHubSrc();
+            var url = string.IsNullOrWhiteSpace(path) ? repository.GitHubTreeSrc() : repository.GitHubBlobSrc();
             var folder = repository switch
             {
                 HRefRepository.ComponentsFluentUI => "FluentUI",
