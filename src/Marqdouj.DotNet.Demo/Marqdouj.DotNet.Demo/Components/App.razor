@@ -1,5 +1,4 @@
-﻿@using Marqdouj.DotNet.Demo.Shared.Components
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -9,10 +8,10 @@
     <ResourcePreloader />
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["Marqdouj.DotNet.Demo.styles.css"]" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.8.1/github-markdown.min.css">
+    <link rel="stylesheet" href="@LinkExtensions.Markdown">
     @* Azure Maps SDK *@
-    <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.css" type="text/css">
-    <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.js"></script>
+    <link rel="stylesheet" href="@LinkExtensions.AtlasMinCss" type="text/css">
+    <script src="@LinkExtensions.AtlasMinJs"></script>
     <ImportMap />
     <AppIcon/>
     <HeadOutlet />
@@ -24,12 +23,12 @@
     <script src="_framework/blazor.web.js"></script>
 
     @* Add the script for Marqdouj.DotNet.AzureMaps *@
-    <script src="./_content/Marqdouj.DotNet.AzureMaps/marqdouj-azuremaps.js"></script>
+    <script src="@LinkExtensions.MarqdoujAzureMapsJs"></script>
 
     @* Add the script required for Anonymous authentication (if applicable) *@
     @* <script type="text/javascript">
         marqdoujAzureMaps.MapFactory.getAuthTokenCallback = (resolve, reject, map) => {
-            DotNet.invokeMethodAsync('Sandbox', 'GetAccessToken')
+            DotNet.invokeMethodAsync('Marqdouj.DotNet.Demo', 'GetAccessToken')
             .then(function (response) {
                 return response;
             }).then(function (token) {

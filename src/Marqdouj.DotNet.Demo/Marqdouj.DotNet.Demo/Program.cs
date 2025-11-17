@@ -1,9 +1,8 @@
 using Marqdouj.DotNet.AzureMaps.UI.Services;
-using Marqdouj.DotNet.Demo.Shared.AzureMaps;
 using Marqdouj.DotNet.Demo.Components;
-using Marqdouj.DotNet.Web.Components.Geolocation;
 using Marqdouj.DotNet.Web.Components.Services;
 using Microsoft.FluentUI.AspNetCore.Components;
+using Marqdouj.DotNet.Demo.Shared.Models.AzureMaps;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -9,20 +9,20 @@
 
 @code {
     private string htmlContent = "";
-    private string projectUrl => $"https://github.com/marqdouj/{Repository}";
     private string height => string.IsNullOrWhiteSpace(Height) ? "height:90%" : $"height:{Height}";
 
     [Parameter]
     public string? Height { get; set; }
 
-    [Parameter, EditorRequired] public string Repository { get; set; } = string.Empty;
+    [Parameter, EditorRequired]
+    public HRefRepository? Repository { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        if (!string.IsNullOrEmpty(Repository))
+        if (Repository.HasValue)
         {
             var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
-            var url = $"https://raw.githubusercontent.com/marqdouj/{Repository}/master/README.md";
+            var url = Repository.ReadMe();
             var markdownContent = await Http.GetStringAsync(url);
             htmlContent = Markdown.ToHtml(markdownContent, pipeline);
         }

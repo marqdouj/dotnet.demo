@@ -1,7 +1,7 @@
 ﻿using Marqdouj.DotNet.AzureMaps.Map.GeoJson;
 using Marqdouj.DotNet.AzureMaps.Map.Interop.Layers;
 
-namespace Marqdouj.DotNet.Demo.Shared.AzureMaps
+namespace Marqdouj.DotNet.Demo.Shared.Models.AzureMaps
 {
     public interface IMapDataService
     {

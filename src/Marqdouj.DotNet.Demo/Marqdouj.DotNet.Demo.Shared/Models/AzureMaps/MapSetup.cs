@@ -6,7 +6,7 @@ using Marqdouj.DotNet.AzureMaps.Map.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Marqdouj.DotNet.Demo.Shared.AzureMaps
+namespace Marqdouj.DotNet.Demo.Shared.Models.AzureMaps
 {
     public static class MapSetup
     {
