@@ -6,7 +6,7 @@ namespace Marqdouj.DotNet.Demo.CustomMaps
     public class DemoCustomMaps(IJSRuntime jsRuntime) : IAsyncDisposable
     {
         private readonly Lazy<Task<IJSObjectReference>> moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
-                "import", "./_content/DemoApp.AzureMaps/demoapp-azuremaps.js").AsTask());
+                "import", "./_content/Marqdouj.DotNet.Demo.CustomMaps/demo-custommaps.js").AsTask());
 
         public async ValueTask<bool> MapExists(string mapId)
         {

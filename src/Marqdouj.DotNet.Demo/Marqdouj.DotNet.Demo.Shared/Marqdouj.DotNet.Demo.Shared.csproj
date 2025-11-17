@@ -18,4 +18,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Marqdouj.DotNet.Demo.CustomMaps\Marqdouj.DotNet.Demo.CustomMaps.csproj" />
+  </ItemGroup>
+
 </Project>

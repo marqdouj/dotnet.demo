@@ -3,7 +3,7 @@ using Marqdouj.DotNet.AzureMaps.Map.GeoJson;
 using Marqdouj.DotNet.AzureMaps.Map.Options;
 using Microsoft.FluentUI.AspNetCore.Components;
 
-namespace Marqdouj.DotNet.Demo.Components.Pages.AzureMaps
+namespace Marqdouj.DotNet.Demo.Shared.Components.Pages.AzureMaps
 {
     internal static class MapHelpers
     {
