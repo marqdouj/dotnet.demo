@@ -9,6 +9,7 @@ In this demo, there are two configurations you can run:
   - Startup Project: `DemoApp` 
 - `Aspire`. Runs the demo app within an Aspire container.
   - Startup Project: `AspireDemo.AppHost` 
+  - **USES** [Docker](https://www.docker.com/products/docker-desktop/) which is free.
 
 ## Packages
 
