@@ -1,4 +1,8 @@
 <Solution>
+  <Project Path="AspireDemo/AspireDemo.ApiService/AspireDemo.ApiService.csproj" />
+  <Project Path="AspireDemo/AspireDemo.AppHost/AspireDemo.AppHost.csproj" Id="b8621c0b-beeb-4d5e-8e84-82dbf919953e" />
+  <Project Path="AspireDemo/AspireDemo.ServiceDefaults/AspireDemo.ServiceDefaults.csproj" />
+  <Project Path="AspireDemo/AspireDemo.WebApp/AspireDemo.WebApp.csproj" Id="8b604893-e2a9-45e9-811d-408fdbadcd19" />
   <Project Path="DemoApp.CustomMaps/DemoApp.CustomMaps.csproj" Id="b88e41e7-09ce-4833-a402-4656ec087e9b" />
   <Project Path="DemoApp.Shared/DemoApp.Shared.csproj" Id="0ee74197-691e-4999-b9d0-50f0ad413930" />
   <Project Path="DemoApp/DemoApp.csproj" />
