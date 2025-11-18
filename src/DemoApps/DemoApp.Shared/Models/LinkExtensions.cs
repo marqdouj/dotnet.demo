@@ -41,6 +41,7 @@
                 HRefRepository.ComponentsFluentUI => "FluentUI",
                 HRefRepository.MailDev => "MailDevHost",
                 HRefRepository.MailKit => "MailKitClient",
+                HRefRepository.Demo => "DemoApps",
                 _ => $"{repository.Name(true)}",
             };
 
