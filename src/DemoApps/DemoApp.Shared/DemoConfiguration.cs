@@ -1,0 +1,48 @@
+﻿using Marqdouj.DotNet.AzureMaps.UI.Services;
+using DemoApp.Shared.Models.AzureMaps;
+using Marqdouj.DotNet.Web.Components.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+namespace DemoApp.Shared
+{
+    public enum DemoMode
+    {
+        Normal,
+        Aspire,
+    }
+
+    public interface IDemoConfiguration
+    {
+        DemoMode Mode { get; }
+    }
+
+    internal class DemoConfiguration(DemoMode mode) : IDemoConfiguration
+    {
+        public DemoMode Mode { get; } = mode;
+    }
+
+    public static class DemoConfigurationExtensions
+    {
+        public static IHostApplicationBuilder AddDemoConfiguration(this IHostApplicationBuilder builder, DemoMode mode)
+        {
+            var services = builder.Services;
+
+            services.AddSingleton<IDemoConfiguration>(new DemoConfiguration(mode));
+
+            #region Marqdouj.DotNet.Web.Components
+            services.AddJSLoggerService();
+            services.AddScoped<IGeolocationService, GeolocationService>(); //Also used with Azure Maps demo.
+            services.AddScoped<IResizeObserverService, ResizeObserverService>();
+            #endregion
+
+            #region Marqdouj.DotNet.AzureMaps
+            builder.Services.AddMapConfiguration(builder.Configuration);
+            builder.Services.AddScoped<IAzureMapsXmlService, AzureMapsXmlService>(); //Only for demo purposes; not required in production.
+            builder.Services.AddScoped<IMapDataService, MapDataService>(); //Only for demo purposes; simulates getting map data from an API.
+            #endregion
+
+            return builder;
+        }
+    }
+}

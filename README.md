@@ -3,6 +3,13 @@
 ## Summary
 This repository demontrates the use of my `DotNet` NuGet packages.
 
+## Details
+In this demo, there are two configurations you can run:
+- `Normal`. Runs the demo standalone.
+  - Startup Project: `DemoApp` 
+- `Aspire`. Runs the demo app within an Aspire container.
+  - Startup Project: `AspireDemo.AppHost` 
+
 ## Packages
 
 - `DotNet.General` [GitHub](https://github.com/marqdouj/dotnet.general), [NuGet](https://www.nuget.org/packages/Marqdouj.DotNet.General/)
