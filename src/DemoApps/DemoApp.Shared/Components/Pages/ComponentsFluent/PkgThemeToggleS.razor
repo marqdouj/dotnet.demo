@@ -1,0 +1,23 @@
+﻿@using DemoApp.Shared.Models
+<PageTitle>Components (Fluent) - Theme Toggle</PageTitle>
+
+<FluentLayout>
+    <PkgPageHeader Header="@subject"
+                   HRefCode="@hRefCode"
+                   Subject="@subject">
+        <FluentLabel>
+            Component for toggling between light and dark themes.<br />
+            NOTE: This component is also on the Home page in the Header (far right).
+        </FluentLabel>
+    </PkgPageHeader>
+
+    <FluentCard AreaRestricted="false" MinimalStyle="true">
+        <FluentLabel>Click on the button to toggle the theme.<br /><br /></FluentLabel>
+        <ThemeToggle />
+    </FluentCard>
+</FluentLayout>
+
+@code {
+    private readonly string hRefCode = HRefRepository.ComponentsFluentUI.GitHubSrcItem(null, "Themes/ThemeToggle.razor");
+    private readonly string subject = "Theme Toggle";
+}

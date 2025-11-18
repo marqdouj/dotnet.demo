@@ -1,0 +1,76 @@
+﻿@using DemoApp.Shared.Models
+@using Marqdouj.DotNet.General
+@using Marqdouj.DotNet.Web.Components.FluentUI.Extensions
+@using Marqdouj.DotNet.Web.Components.FluentUI.UIInput
+@inject IToastService ToastService
+
+<PageTitle>@subject</PageTitle>
+
+<FluentLayout>
+    <PkgPageHeader Header="@subject"
+                   HRefCode="@hRefCode"
+                   Subject="@subject" >
+		<FluentLabel>Manages a list of Enum (no duplicates)</FluentLabel>
+    </PkgPageHeader>
+	
+	<FluentCard AreaRestricted="false" >
+		<FluentStack Orientation="Orientation.Vertical">
+			<FluentLabel>Select a value and click on 'Add'.</FluentLabel>
+			<FluentLabel>
+				If you try to add a value already in the list
+				it will be ignored and a message will be displayed.
+			</FluentLabel>
+
+			<FluentStack>
+				<FluentSelect Items="@values"
+							  OptionText="@(i => i.Text)"
+							  OptionValue="@(i => i.Value)"
+							  @bind-Value="@selectedValue" />
+				<FluentButton Appearance="Appearance.Accent" @onclick="AddValue">Add</FluentButton>
+			</FluentStack>
+		</FluentStack>
+		<br />
+		<FluentLabel>Items:</FluentLabel>
+		<ol>
+			@{
+				foreach (var item in enumList.Items.OrderBy(e => e))
+				{
+					<li>@item.ToString()</li>
+				}
+			}
+		</ol>
+	</FluentCard>
+
+</FluentLayout>
+
+@code {
+	private readonly string hRefCode = HRefRepository.General.GitHubSrcItem(null, "EnumList.cs");
+	private readonly string subject = "EnumList";
+	private List<Option<string>> values = UIExtensions.GetEnumLookup<MyEnum>(false);
+	private string selectedValue = MyEnum.Alpha.ToString();
+	private readonly EnumList<MyEnum> enumList = new();
+
+	private enum MyEnum
+	{
+		Alpha,
+		Bravo,
+		Charlie,
+		Delta,
+		Echo,
+	}
+
+	private void AddValue()
+	{
+		if (Enum.TryParse<MyEnum>(selectedValue, out var value))
+		{
+			if (!enumList.AddValue(value))
+			{
+				ToastService.Warning($"'{selectedValue}' was not added.");
+			}
+		}
+		else
+		{
+			ToastService.Warning($"Something went wrong, unable to parse the selected value: {selectedValue}");
+		}
+	}
+}

@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="DemoApp.CustomMaps/DemoApp.CustomMaps.csproj" Id="b88e41e7-09ce-4833-a402-4656ec087e9b" />
+  <Project Path="DemoApp.Shared/DemoApp.Shared.csproj" Id="0ee74197-691e-4999-b9d0-50f0ad413930" />
+  <Project Path="DemoApp/DemoApp.csproj" />
+</Solution>

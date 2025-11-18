@@ -1,0 +1,25 @@
+﻿@using DemoApp.Shared.Models
+<PageTitle>@subject</PageTitle>
+
+<FluentLayout>
+    <PkgPageHeader Header="@subject"
+                   HRefCode="@hRefCode"
+                   Subject="@subject" />
+
+    <FluentGrid>
+        <FluentGridItem>
+            <PkgToNumber />
+        </FluentGridItem>
+        <FluentGridItem>
+            <PkgNList />
+        </FluentGridItem>
+        <FluentGridItem>
+            <PkgIsNumber/>
+        </FluentGridItem>
+    </FluentGrid>
+</FluentLayout>
+
+@code {
+    private readonly string hRefCode = HRefRepository.General.GitHubSrcItem(null, "Extensions/Numbers.cs");
+    private readonly string subject = "Number Extensions";
+}
