@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="AspireDemo/AspireDemo.ApiClient/AspireDemo.ApiClient.csproj" Id="02f4107d-bcd8-43e0-bee1-35baed5784b9" />
   <Project Path="AspireDemo/AspireDemo.ApiService/AspireDemo.ApiService.csproj" />
   <Project Path="AspireDemo/AspireDemo.AppHost/AspireDemo.AppHost.csproj" Id="b8621c0b-beeb-4d5e-8e84-82dbf919953e" />
   <Project Path="AspireDemo/AspireDemo.ServiceDefaults/AspireDemo.ServiceDefaults.csproj" />

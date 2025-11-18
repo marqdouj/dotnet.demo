@@ -1,0 +1,35 @@
+﻿@page "/aspire-newsletter"
+@using AspireDemo.ApiClient
+@rendermode InteractiveServer
+@inject IApiServiceClient ApiServiceClient
+
+<PageTitle>Newsletter</PageTitle>
+
+<FluentLayout>
+    <FluentHeader>Email Service</FluentHeader>
+
+    <FluentLabel Typo="Typography.Subject">
+        This example demonstrates using <span class="subject">MailKit/MailDev</span>
+        to subscribe/unsubscribe to a newsletter.
+        <br /><br />
+        Open up the <CodeText>'MailDev'</CodeText> Aspire dashboard resource to view emails.
+    </FluentLabel>
+    <br />
+    <FluentCard>
+        <FluentLabel Typo="Typography.Subject">Email Service (Newsletter)</FluentLabel>
+        <br />
+        <FluentLabel>@subscribedMessage</FluentLabel>
+        <NewsletterButtons SubscribeChanged="@OnSubscribeChanged" />
+    </FluentCard>
+</FluentLayout>
+
+@code {
+    private bool subscribed;
+    private string subscribedMessage => subscribed ? "Thank you for subscribing to our newsletter." : "Please subscribe to our newsletter.";
+
+    private void OnSubscribeChanged(bool value)
+    {
+        subscribed = value;
+        StateHasChanged();
+    }
+}

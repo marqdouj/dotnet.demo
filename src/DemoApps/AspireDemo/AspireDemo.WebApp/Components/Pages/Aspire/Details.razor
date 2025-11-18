@@ -1,0 +1,23 @@
+﻿@page "/aspire-details"
+
+<PageTitle>Aspire Email</PageTitle>
+
+<FluentLayout>
+	<FluentHeader>@header</FluentHeader>
+
+	<FluentTabs Height="90%">
+		<FluentTab Label="MailKit">
+			<ReadMeView Repository="HRefRepository.MailKit" Height="@height" />
+		</FluentTab>
+
+		<FluentTab Label="MailDev">
+			<ReadMeView Repository="HRefRepository.MailDev" Height="@height" />
+		</FluentTab>
+	</FluentTabs>
+
+</FluentLayout>
+
+@code {
+	private string header => $"{HRefRepository.MailKit.Name()} - {HRefRepository.MailDev.Name()}";
+	private string height = "600px";
+}

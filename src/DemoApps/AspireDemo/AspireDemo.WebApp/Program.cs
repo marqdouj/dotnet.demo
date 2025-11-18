@@ -1,3 +1,4 @@
+using AspireDemo.ApiClient;
 using AspireDemo.WebApp.Components;
 using DemoApp.Shared;
 using Microsoft.FluentUI.AspNetCore.Components;
@@ -17,12 +18,12 @@ builder.AddDemoConfiguration(DemoMode.Aspire);
 
 builder.Services.AddOutputCache();
 
-//builder.Services.AddHttpClient<AspireDemoApiClient>(client =>
-//{
-//    // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
-//    // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
-//    client.BaseAddress = new("https+http://apiservice");
-//});
+builder.Services.AddHttpClient<IApiServiceClient, ApiServiceClient>(client =>
+{
+    // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
+    // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
+    client.BaseAddress = new("https+http://apiservice");
+});
 
 var app = builder.Build();
 

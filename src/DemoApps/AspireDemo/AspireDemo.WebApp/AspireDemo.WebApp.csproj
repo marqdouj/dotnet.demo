@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\DemoApp.CustomMaps\DemoApp.CustomMaps.csproj" />
     <ProjectReference Include="..\..\DemoApp.Shared\DemoApp.Shared.csproj" />
+    <ProjectReference Include="..\AspireDemo.ApiClient\AspireDemo.ApiClient.csproj" />
     <ProjectReference Include="..\AspireDemo.ServiceDefaults\AspireDemo.ServiceDefaults.csproj" />
   </ItemGroup>
 </Project>

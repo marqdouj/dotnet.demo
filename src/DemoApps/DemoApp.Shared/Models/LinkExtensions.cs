@@ -8,6 +8,8 @@
         ComponentsFluentUI,
         Demo,
         General,
+        MailDev,
+        MailKit,
     }
 
     public static class LinkExtensions
@@ -37,6 +39,8 @@
             var folder = repository switch
             {
                 HRefRepository.ComponentsFluentUI => "FluentUI",
+                HRefRepository.MailDev => "MailDevHost",
+                HRefRepository.MailKit => "MailKitClient",
                 _ => $"{repository.Name(true)}",
             };
 
@@ -54,18 +58,13 @@
         public static string GitHubSrcItem(this HRefRepository repository, string? projectName = null, string path = "")
         {
             var url = repository.GitHubBlobSrc();
-            var folder = repository switch
-            {
-                HRefRepository.ComponentsFluentUI => "FluentUI",
-                HRefRepository.Demo => "DemoApps",
-                _ => $"{repository.Name(true)}",
-            };
+            var folder = repository.GitHubRepositoryFolder();
 
             return Path.Combine(url, folder, projectName ?? repository.Name(true), path);
         }
 
         public static string ReadMe(this HRefRepository repository)
-            => Path.Combine(repository.GitHubContent(), "master/README.md");
+            => Path.Combine(repository.GitHubContent(), "master", "README.md");
 
         public static string ReadMe(this HRefRepository? repository)
             => repository != null ? repository.Value.ReadMe() : "";
@@ -82,6 +81,8 @@
                 HRefRepository.ComponentsFluentUI => $"{prefix}DotNet.Web.Components.FluentUI",
                 HRefRepository.Demo => $"{prefix}DotNet.Demo",
                 HRefRepository.General => $"{prefix}DotNet.General",
+                HRefRepository.MailDev => "DotNet.Aspire.MailDev",
+                HRefRepository.MailKit => "DotNet.Aspire.MailKit",
                 _ => throw new ArgumentOutOfRangeException(nameof(repository)),
             };
         }

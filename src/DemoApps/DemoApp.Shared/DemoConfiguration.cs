@@ -15,11 +15,13 @@ namespace DemoApp.Shared
     public interface IDemoConfiguration
     {
         DemoMode Mode { get; }
+        bool InDevelopment { get; }
     }
 
-    internal class DemoConfiguration(DemoMode mode) : IDemoConfiguration
+    internal class DemoConfiguration(DemoMode mode, bool inDevelopment) : IDemoConfiguration
     {
         public DemoMode Mode { get; } = mode;
+        public bool InDevelopment { get; } = inDevelopment;
     }
 
     public static class DemoConfigurationExtensions
@@ -28,7 +30,7 @@ namespace DemoApp.Shared
         {
             var services = builder.Services;
 
-            services.AddSingleton<IDemoConfiguration>(new DemoConfiguration(mode));
+            services.AddSingleton<IDemoConfiguration>(new DemoConfiguration(mode, builder.Environment.IsDevelopment()));
 
             #region Marqdouj.DotNet.Web.Components
             services.AddJSLoggerService();

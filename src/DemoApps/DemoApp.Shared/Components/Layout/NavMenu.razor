@@ -1,4 +1,5 @@
 ﻿@rendermode InteractiveServer
+@inject IDemoConfiguration DemoConfiguration
 
 <div class="navmenu">
     <input type="checkbox" title="Menu expand/collapse toggle" id="navmenu-toggle" class="navmenu-icon" />
@@ -53,10 +54,19 @@
                 <FluentNavLink Href="map-events" Icon="@(new Icons.Regular.Size20.Map())" IconColor="Color.Accent">Map Events</FluentNavLink>
                 <FluentNavLink Href="multiple-maps" Icon="@(new Icons.Regular.Size20.Multiplier2x())" IconColor="Color.Accent">Multiple Maps</FluentNavLink>
             </FluentNavGroup>
+
+            @if (isAspire)
+            {
+                <FluentNavGroup Title="Aspire" Icon="@(new Icons.Regular.Size20.GroupList())" IconColor="Color.Accent">
+                    <FluentNavLink Href="aspire-details" Icon="@(new Icons.Regular.Size20.Notebook())" IconColor="Color.Accent">Details</FluentNavLink>
+                    <FluentNavLink Href="aspire-newsletter" Icon="@(new Icons.Regular.Size20.News())" IconColor="Color.Accent">Newsletter</FluentNavLink>
+                </FluentNavGroup>
+            }
         </FluentNavMenu>
     </nav>
 </div>
 
 @code {
     private bool expanded = true;
+    private bool isAspire => DemoConfiguration.Mode == DemoMode.Aspire;
 }
