@@ -6,6 +6,29 @@
 	<FluentHeader>@header</FluentHeader>
 
 	<FluentTabs Height="90%">
+		<FluentTab Label="Notes">
+			<FluentLabel Typo="Typography.Subject">
+				The Api Service is configured for both
+				<a href="https://learn.microsoft.com/en-us/aspnet/core/fundamentals/openapi/using-openapi-documents", target="_blank">Swagger and Scalar</a>
+				Open API.
+				<br />
+				The Aspire dashboard is configured to use Swagger when you launch the Api Service.
+				<br />
+				You can change the default in <CodeText>launchSettings.json</CodeText>:
+				<br />
+				Swagger: <CodeText>"launchUrl": "swagger",</CodeText>
+				<br />
+				Scalar: <CodeText>"launchUrl": "scalar",</CodeText>
+				<br />
+				You can manually launch either one by typing directly into browser navigation:
+				<br />
+				Swagger: <CodeText>@urlSwagger</CodeText>
+				<br />
+				Scalar: <CodeText>@urlScalar</CodeText>
+				<br />
+			</FluentLabel>
+			
+		</FluentTab>
 		<FluentTab Label="MailKit">
 			<ReadMeView Repository="HRefRepository.MailKit" Height="@height" />
 		</FluentTab>
@@ -20,4 +43,6 @@
 @code {
 	private string header => $"{HRefRepository.MailKit.Name()} - {HRefRepository.MailDev.Name()}";
 	private string height = "600px";
+	private const string urlSwagger = "https://localhost:<port>/swagger";
+	private const string urlScalar = "https://localhost:<port>/scalar";
 }

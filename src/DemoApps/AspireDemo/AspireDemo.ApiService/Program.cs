@@ -1,6 +1,6 @@
 using AspireDemo.ApiService.Endpoints;
 using AspireDemo.ApiService.Services;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +25,8 @@ app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+
+    app.MapScalarApiReference();
 
     app.UseSwaggerUI(options =>
     {
