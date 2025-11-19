@@ -18,3 +18,5 @@ In this demo, there are two configurations you can run:
 - `DotNet.Web.Components.FluentUI` [GitHub](https://github.com/marqdouj/dotnet.web.components.fluentUI), [NuGet](https://www.nuget.org/packages/Marqdouj.DotNet.Web.Components.FluentUI/)
 - `DotNet.AzureMaps` [GitHub](https://github.com/marqdouj/dotnet.azuremaps), [NuGet](https://www.nuget.org/packages/Marqdouj.DotNet.AzureMaps/)
 - `DotNet.AzureMaps.UI` [GitHub](https://github.com/marqdouj/dotnet.azuremaps.ui), [NuGet](https://www.nuget.org/packages/Marqdouj.DotNet.AzureMaps.UI/)
+- `DotNet.Aspire.MailDev` [GitHub](https://github.com/marqdouj/dotnet.aspire.maildev), [NuGet](https://www.nuget.org/packages/Marqdouj.DotNet.Aspire.MailDev/)
+- `DotNet.Aspire.MailKit` [GitHub](https://github.com/marqdouj/dotnet.aspire.mailkit), [NuGet](https://www.nuget.org/packages/Marqdouj.DotNet.Aspire.Mailkit/)
