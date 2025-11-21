@@ -27,7 +27,8 @@
             try
             {
                 var markdownContent = await Http.GetStringAsync(url);
-                htmlContent = Markdown.ToHtml(markdownContent, pipeline);
+                var html = Markdown.ToHtml(markdownContent, pipeline);
+                htmlContent = AddBlankTargetToAnchorTags(html);
             }
             catch (Exception ex)
             {
@@ -41,5 +42,62 @@
                 }
             }
         }
+    }
+
+    private static string AddBlankTargetToAnchorTags(string content)
+    {
+        var result = content;
+        var pStart = 0;
+        var pEnd = 0;
+        const string aStart = "<a href";
+        const string aEnd = "</a>";
+        const string hRefEnd = "\">";
+        const string target = " target=\"_blank\"";
+        List<AnchorValues> anchors = [];
+
+        try
+        {
+            while (pStart > -1)
+            {
+                pStart = content.IndexOf(aStart, pEnd, StringComparison.OrdinalIgnoreCase);
+
+                if (pStart > -1)
+                {
+                    pEnd = content.IndexOf(aEnd, pStart, StringComparison.OrdinalIgnoreCase);
+
+                    if (pEnd == -1)
+                        break;
+
+                    var anchor = content.Substring(pStart, pEnd - pStart + aEnd.Length);
+
+                    if (anchor.IndexOf(target, StringComparison.OrdinalIgnoreCase) == -1)
+                    {
+                        var pInsert = anchor.IndexOf(hRefEnd);
+                        var a = anchor.Insert(pInsert + hRefEnd.Length - 1, target);
+                        anchors.Add(new AnchorValues(anchor, a));
+                    }
+
+                    pStart = pEnd;
+                }
+            }
+
+            foreach (var a in anchors)
+            {
+                result = result.Replace(a.Normal, a.Target);
+            }
+        }
+        catch (Exception ex)
+        {
+            result = content;
+            Console.WriteLine(ex.ToMessage());
+        }
+
+        return result;
+    }
+
+    private class AnchorValues (string normal, string target)
+    {
+        public string Normal { get; } = normal;
+        public string Target { get; } = target;
     }
 }
