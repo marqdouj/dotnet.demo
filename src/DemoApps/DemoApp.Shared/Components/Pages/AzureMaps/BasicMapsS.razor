@@ -8,7 +8,9 @@
 @using Marqdouj.DotNet.AzureMaps.Map.Interop.Layers
 @using Marqdouj.DotNet.AzureMaps.Map.Options
 @using Marqdouj.DotNet.AzureMaps.UI.Components
+@using Marqdouj.DotNet.AzureMaps.UI.Models
 @using Marqdouj.DotNet.AzureMaps.UI.Models.Maps
+@using Marqdouj.DotNet.AzureMaps.UI.Models.Maps.Options
 @using Marqdouj.DotNet.AzureMaps.UI.Services
 @using Marqdouj.DotNet.Web.Components.Css
 @using Marqdouj.DotNet.Web.Components.FluentUI.Extensions
@@ -51,6 +53,9 @@
 
 	<FluentToolbar>
 		<FluentButton Disabled="@disabled" IconStart="@(new Icons.Regular.Size20.ArrowReset())" Title="Reset Map" OnClick="@ResetMap" />
+		<FluentSpacer Width="8" />
+		<FluentButton Disabled="@disabled" IconStart="@(new Icons.Regular.Size20.Camera())" Title="Camera" OnClick="@SetMapCameraOptions" />
+		<FluentButton Disabled="@disabled" IconStart="@(new Icons.Regular.Size20.TextEditStyle())" Title="Style" OnClick="@SetMapStyleOptions" />
 		<FluentSpacer Width="8" />
 		<FluentButton Disabled="@isSymbolLayerDisabled" IconStart="@(new Icons.Regular.Size20.GlobeSearch())" Title="Get Current Location" OnClick="@GetCurrentPosition" />
 		@{
@@ -116,6 +121,15 @@
 		}
 	}
 
+	private void UpdateShowNarrative()
+	{
+		if (showNarrativeFirstTime)
+		{
+			showNarrativeFirstTime = false;
+			showNarrative = false;
+		}
+	}
+
 	private async Task AddMapLayer(MapLayerType layerType)
 	{
 		try
@@ -128,9 +142,7 @@
 			{
 				var uiModel = uiLayerDef.GetLayerDefUIModel(XmlService);
 				var inputs = uiModel.GetInputs();
-				var parameters = MapHelpers.GetDefaultDialogParameters($"{layerType} Layer Settings");
-				IDialogReference dialog = await DialogService.ShowDialogAsync<UILayerDefInputDialog>(inputs, parameters);
-				DialogResult? result = await dialog.Result;
+				var result = await DialogService.ShowInputsDialog($"{layerType} Layer Settings", uiModel);
 
 				if (result.Cancelled)
 					return;
@@ -143,11 +155,69 @@
 			layerDef = await mapInterop.AddBasicMapLayer(DataService, uiLayerDef);
 			activeTab = tabMap;
 
-			if (showNarrativeFirstTime)
-			{
-				showNarrativeFirstTime = false;
-				showNarrative = false;
-			}
+			UpdateShowNarrative();
+		}
+		catch (Exception ex)
+		{
+			Logger.LogError(ex, null);
+			ToastService.Error(ex);
+		}
+		finally
+		{
+			overlay = false;
+		}
+	}
+
+	private async Task SetMapCameraOptions()
+	{
+		try
+		{
+			if (mapInterop == null) return;
+
+			var camera = await mapInterop.Configuration.GetCamera();
+			var uiModel = new CameraOptionsUIModel(XmlService) { Source = camera.ToCameraOptions() };
+			var result = await DialogService.ShowInputsDialog("Camera Settings", uiModel);
+
+			if (result.Cancelled)
+				return;
+
+			overlay = true;
+
+			await mapInterop.Configuration.SetCamera(uiModel.Source);
+			activeTab = tabMap;
+
+			UpdateShowNarrative();
+		}
+		catch (Exception ex)
+		{
+			Logger.LogError(ex, null);
+			ToastService.Error(ex);
+		}
+		finally
+		{
+			overlay = false;
+		}
+	}
+
+	private async Task SetMapStyleOptions()
+	{
+		try
+		{
+			if (mapInterop == null) return;
+
+			var style = await mapInterop.Configuration.GetStyle();
+			var uiModel = new StyleOptionsUIModel(XmlService) { Source = style };
+			var result = await DialogService.ShowInputsDialog("Style Settings", uiModel);
+
+			if (result.Cancelled)
+				return;
+
+			overlay = true;
+
+			await mapInterop.Configuration.SetStyle(uiModel.Source);
+			activeTab = tabMap;
+
+			UpdateShowNarrative();
 		}
 		catch (Exception ex)
 		{
