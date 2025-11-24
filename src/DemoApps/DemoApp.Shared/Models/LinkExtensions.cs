@@ -38,13 +38,10 @@
         {
             var folder = repository switch
             {
-                HRefRepository.ComponentsFluentUI => "FluentUI",
                 HRefRepository.MailDev => "MailDevHost",
                 HRefRepository.MailKit => "MailKitClient",
                 HRefRepository.Demo => "DemoApps",
-                HRefRepository.AzureMaps => "MainLib",
-                HRefRepository.AzureMapsUI => "MainLib",
-                _ => $"{repository.Name(true)}",
+                _ => "MainLib",
             };
 
             return folder;
