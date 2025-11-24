@@ -38,8 +38,6 @@
         {
             var folder = repository switch
             {
-                HRefRepository.MailDev => "MailDevHost",
-                HRefRepository.MailKit => "MailKitClient",
                 HRefRepository.Demo => "DemoApps",
                 _ => "MainLib",
             };
