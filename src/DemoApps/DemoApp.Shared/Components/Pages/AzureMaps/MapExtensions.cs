@@ -1,5 +1,5 @@
 ﻿using DemoApp.Shared.Models;
-using Marqdouj.DotNet.AzureMaps.Map.Interop.Layers;
+using Marqdouj.DotNet.AzureMaps.Map.Layers;
 
 namespace DemoApp.Shared.Components.Pages.AzureMaps
 {
@@ -11,7 +11,7 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
 
     internal static class MapExtensions
     {
-        public static string? ToHRefAddLayerExample(this MapLayerDef? layerDef) => layerDef?.Type.ToHRefAddLayerExample();
+        public static string? ToHRefAddLayerExample(this MapLayerDef? layerDef) => layerDef?.LayerType.ToHRefAddLayerExample();
 
         public static string ToHRefAddLayerExample(this MapLayerType layerType)
         {
@@ -19,7 +19,7 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
             return hRef;
         }
 
-        public static string? ToHRefAzureDocs(this MapLayerDef? layerDef) => layerDef?.Type.ToHRefAzureDocs();
+        public static string? ToHRefAzureDocs(this MapLayerDef? layerDef) => layerDef?.LayerType.ToHRefAzureDocs();
 
         public static string ToHRefAzureDocs(this MapLayerType layerType)
         {

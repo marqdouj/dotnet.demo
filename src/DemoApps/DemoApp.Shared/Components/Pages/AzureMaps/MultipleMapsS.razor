@@ -2,7 +2,7 @@
 @using Marqdouj.DotNet.AzureMaps.Map.Controls
 @using Marqdouj.DotNet.AzureMaps.Map.Events
 @using Marqdouj.DotNet.AzureMaps.Map.Interop
-@using Marqdouj.DotNet.AzureMaps.Map.Options
+@using Marqdouj.DotNet.AzureMaps.Map.Configuration
 @using Marqdouj.DotNet.Web.Components.FluentUI.Extensions
 @using Microsoft.Extensions.Logging
 @using Microsoft.JSInterop
@@ -34,7 +34,7 @@
                       Width="@mapWidth"
                       Controls="@controlsA"
                       OnMapEventReady="@OnMapEventReady"
-                      Options="@optionsA" />
+                      Options="@MapHelpers.GetDefaultCreateMapOptions()" />
         </FluentStack>
 
         <FluentStack Orientation="Orientation.Vertical">
@@ -64,8 +64,9 @@
     private const string mapIdA = "mapA";
     private const string mapIdB = "mapB";
     private bool overlay;
-    private MapOptions optionsA = MapHelpers.GetDefaultMapOptions();
-    private MapOptions optionsB = MapHelpers.GetDefaultMapOptions();
+    private MapOptions optionsB = MapHelpers.GetDefaultCreateMapOptions();
+    private MapOptionsSet optionsSetA = MapHelpers.GetDefaultSetMapOptions();
+    private MapOptionsSet optionsSetB = MapHelpers.GetDefaultSetMapOptions();
     private MapInterop? mapInteropA;
     private MapInterop? mapInteropB;
     private List<MapControl>? controlsA;
@@ -82,6 +83,10 @@
         
         //Customize options for map B
         optionsB.Style = new StyleOptions
+        {
+            Style = MapStyle.Night
+        };
+        optionsSetB.Style = new StyleOptions
         {
             Style = MapStyle.Night
         };
@@ -117,10 +122,10 @@
             switch (mapId)
             {
                 case mapIdA:
-                    await mapInteropA!.Configuration.SetMapOptions(optionsA!);
+                    await mapInteropA!.Configuration.SetMapOptions(optionsSetA!);
 				    break;
                 case mapIdB:
-                    await mapInteropB!.Configuration.SetMapOptions(optionsB!);
+                    await mapInteropB!.Configuration.SetMapOptions(optionsSetB!);
 					break;
             }
             

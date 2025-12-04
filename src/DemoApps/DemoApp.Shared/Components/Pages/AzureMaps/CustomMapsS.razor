@@ -2,7 +2,7 @@
 @using Marqdouj.DotNet.AzureMaps
 @using Marqdouj.DotNet.AzureMaps.Map.Events
 @using Marqdouj.DotNet.AzureMaps.Map.Interop
-@using Marqdouj.DotNet.AzureMaps.Map.Options
+@using Marqdouj.DotNet.AzureMaps.Map.Configuration
 @using Marqdouj.DotNet.Web.Components.FluentUI.Extensions
 @using Microsoft.Extensions.Logging
 @using Microsoft.JSInterop
@@ -44,7 +44,7 @@
                   Height="@mapHeight"
                   Width="@mapWidth"
                   OnMapEventReady="@OnMapEventReady"
-                  Options="@options" />
+                  Options="@MapHelpers.GetDefaultCreateMapOptions()" />
     </FluentStack>
 </FluentLayout>
 
@@ -62,7 +62,6 @@
     private string mapWidth = "100%";
     private bool overlay;
     private bool disabled => overlay || mapInterop == null;
-    private MapOptions? options = MapHelpers.GetDefaultMapOptions();
     private MapInterop? mapInterop;
     private DemoCustomMaps? customMaps;
 
@@ -89,7 +88,7 @@
     {
         try
         {
-            await mapInterop!.Configuration.SetMapOptions(options!);
+            await mapInterop!.Configuration.SetMapOptions(MapHelpers.GetDefaultSetMapOptions());
             _= await customMaps!.RemoveControls(mapInterop.MapId);
         }
         catch (Exception ex)

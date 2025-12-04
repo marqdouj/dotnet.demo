@@ -2,8 +2,7 @@
 using Marqdouj.DotNet.AzureMaps.Map.Common;
 using Marqdouj.DotNet.AzureMaps.Map.GeoJson;
 using Marqdouj.DotNet.AzureMaps.Map.Interop;
-using Marqdouj.DotNet.AzureMaps.Map.Interop.Features;
-using Marqdouj.DotNet.AzureMaps.Map.Interop.Layers;
+using Marqdouj.DotNet.AzureMaps.Map.Layers;
 using Marqdouj.DotNet.AzureMaps.UI.Models.Input;
 using Marqdouj.DotNet.AzureMaps.UI.Models.Maps;
 using Marqdouj.DotNet.Web.Components.Css;
@@ -12,10 +11,10 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
 {
     internal static class LayerExtensions
     {
-        public static List<IUIModelInputValue> GetInputs(this ILayerDefUIModel uiModel)
+        public static List<IUIModelInputValue> GetInputs(this ILayerUIModel uiModel)
         {
             var inputs = uiModel.ToUIInputList();
-            var mapType = uiModel.LayerDef!.Type;
+            var mapType = uiModel.LayerDef.LayerType;
 
             switch (mapType)
             {
@@ -34,7 +33,7 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
             return layerType switch
             {
                 MapLayerType.Bubble => new BubbleLayerDef(),
-                MapLayerType.HeatMap => new HeatMapLayerDef() { SourceUrl = await dataService.GetHeatMapLayerUrl() },
+                MapLayerType.HeatMap => await GetDefaultHeatMapLayerDef(dataService),
                 MapLayerType.Image => await GetDefaultImageLayerDef(dataService),
                 MapLayerType.Line => new LineLayerDef()
                 {
@@ -78,6 +77,13 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
             };
         }
 
+        private static async Task<HeatMapLayerDef> GetDefaultHeatMapLayerDef(IMapDataService dataService)
+        {
+            var layerDef = new HeatMapLayerDef();
+            layerDef.DataSource.Url = await dataService.GetHeatMapLayerUrl();
+            return layerDef;
+        }
+
         private static async Task<ImageLayerDef> GetDefaultImageLayerDef(IMapDataService dataService)
         {
             var layerDef = new ImageLayerDef();
@@ -94,7 +100,7 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
 
         public static async Task<MapLayerDef> AddBasicMapLayer(this MapInterop mapInterop, IMapDataService dataService, MapLayerDef layerDef, bool zoomTo = true)
         {
-            return layerDef.Type switch
+            return layerDef.LayerType switch
             {
                 MapLayerType.Bubble => await AddBubbleLayer(mapInterop, dataService, (BubbleLayerDef)layerDef, zoomTo),
                 MapLayerType.HeatMap => await AddHeatMapLayer(mapInterop, (HeatMapLayerDef)layerDef, zoomTo),
@@ -104,7 +110,7 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
                 MapLayerType.PolygonExtrusion => await AddPolygonExtLayer(mapInterop, dataService, (PolygonExtLayerDef)layerDef, zoomTo),
                 MapLayerType.Symbol => await AddSymbolLayer(mapInterop, dataService, (SymbolLayerDef)layerDef, zoomTo),
                 MapLayerType.Tile => await AddTileLayer(mapInterop, dataService, (TileLayerDef)layerDef, zoomTo),
-                _ => throw new ArgumentOutOfRangeException(nameof(layerDef.Type)),
+                _ => throw new ArgumentOutOfRangeException(nameof(layerDef.LayerType)),
             };
         }
 
@@ -121,7 +127,7 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
                         { "demo", true },
                     }
             };
-            await mapInterop.Layers.AddMapFeature(featureDef, layerDef.SourceId);
+            await mapInterop.Layers.AddMapFeature(featureDef, layerDef.DataSource.Id);
 
             if (zoomTo)
                 await mapInterop.Configuration.ZoomTo(data[0], 11);
@@ -163,7 +169,7 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
                 }
             };
 
-            await mapInterop.Layers.AddMapFeature(feature, layerDef.SourceId);
+            await mapInterop.Layers.AddMapFeature(feature, layerDef.DataSource.Id);
 
             if (zoomTo)
                 await mapInterop.Configuration.ZoomTo(data[0], 10);
@@ -186,7 +192,7 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
                 AsShape = true
             };
 
-            await mapInterop.Layers.AddMapFeature(feature, layerDef.SourceId);
+            await mapInterop.Layers.AddMapFeature(feature, layerDef.DataSource.Id);
 
             if (zoomTo)
                 await mapInterop.Configuration.ZoomTo(data[0][0], 11);
@@ -209,7 +215,7 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
                 AsShape = true
             };
 
-            await mapInterop.Layers.AddMapFeature(feature, layerDef.SourceId);
+            await mapInterop.Layers.AddMapFeature(feature, layerDef.DataSource.Id);
 
             if (zoomTo)
                 await mapInterop.Configuration.ZoomTo(data[0][0], 11);
@@ -238,7 +244,7 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
                         { "demo", true },
                     }
                 };
-                await mapInterop.Layers.AddMapFeature(feature, layerDef.SourceId);
+                await mapInterop.Layers.AddMapFeature(feature, layerDef.DataSource.Id);
             }
 
             if (zoomTo)

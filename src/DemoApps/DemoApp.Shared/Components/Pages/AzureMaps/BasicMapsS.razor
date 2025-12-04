@@ -4,9 +4,8 @@
 @using Marqdouj.DotNet.AzureMaps.Map.Events
 @using Marqdouj.DotNet.AzureMaps.Map.GeoJson
 @using Marqdouj.DotNet.AzureMaps.Map.Interop
-@using Marqdouj.DotNet.AzureMaps.Map.Interop.Features
-@using Marqdouj.DotNet.AzureMaps.Map.Interop.Layers
-@using Marqdouj.DotNet.AzureMaps.Map.Options
+@using Marqdouj.DotNet.AzureMaps.Map.Layers
+@using Marqdouj.DotNet.AzureMaps.Map.Configuration
 @using Marqdouj.DotNet.AzureMaps.UI.Components
 @using Marqdouj.DotNet.AzureMaps.UI.Models
 @using Marqdouj.DotNet.AzureMaps.UI.Models.Maps
@@ -59,7 +58,7 @@
 		<FluentSpacer Width="8" />
 		<FluentButton Disabled="@isSymbolLayerDisabled" IconStart="@(new Icons.Regular.Size20.GlobeSearch())" Title="Get Current Location" OnClick="@GetCurrentPosition" />
 		@{
-			foreach (var layerType in Enum.GetValues<MapLayerType>())
+			foreach (var layerType in Enum.GetValues<MapLayerType>().Where(e => e != MapLayerType.Unknown))
 			{
 				<FluentButton Disabled="@disabled" IconStart="@(new Icons.Regular.Size20.Map())" Title="@(layerType.ToString())" OnClick="@(() => AddMapLayer(layerType))">
 					@layerType.ToString()
@@ -74,7 +73,7 @@
                       Width="@mapWidth"
                       Controls="@MapHelpers.GetDefaultControls()"
                       OnMapEventReady="@OnMapEventReady"
-                      Options="@options" />
+                      Options="@MapHelpers.GetDefaultCreateMapOptions()" />
         </FluentTab>
         <FluentTab Id="@tabSettings" Label="Settings">
             <div style="height:25rem;width:100%;">
@@ -99,11 +98,10 @@
 	private string? activeTab = tabMap;
 	private string mapHeight = "400px";
 	private string mapWidth = "100%";
-	private MapOptions? options = MapHelpers.GetDefaultMapOptions();
 	private MapInterop? mapInterop;
 	private MapLayerDef? layerDef;
 	private bool disabled => overlay || mapInterop == null;
-	private bool isSymbolLayer => layerDef != null && layerDef.Type == MapLayerType.Symbol;
+	private bool isSymbolLayer => layerDef != null && layerDef.LayerType == MapLayerType.Symbol;
 	private bool isSymbolLayerDisabled => disabled || !isSymbolLayer;
 	private bool useUI = true;
 
@@ -136,7 +134,7 @@
 		{
 			if (mapInterop == null) return;
 
-			var uiLayerDef = layerDef?.Type == layerType ? layerDef.GetClone() : await layerType.GetDefaultLayerDef(DataService);
+			var uiLayerDef = layerDef?.LayerType == layerType ? layerDef.GetClone() : await layerType.GetDefaultLayerDef(DataService);
 
 			if (useUI)
 			{
@@ -238,11 +236,11 @@
 
 			if (layerDef != null)
 			{
-				await mapInterop.RemoveLayer(layerDef);
+				await mapInterop.Layers.RemoveLayer(layerDef);
 				layerDef = null;
 			}
 
-			await mapInterop.Configuration.SetMapOptions(options!);
+			await mapInterop.Configuration.SetMapOptions(MapHelpers.GetDefaultSetMapOptions());
 		}
 		catch (Exception ex)
 		{
@@ -276,7 +274,7 @@
 							{ "title", "Current Location" },
 						}
 					};
-					await mapInterop!.Layers.AddMapFeature(feature, layerDef!.SourceId, true);
+					await mapInterop!.Layers.AddMapFeature(feature, layerDef!.DataSource.Id, true);
 					await mapInterop.Configuration.ZoomTo(position, 15);
 					ToastService.Info($"Current Location: {position}");
 				}

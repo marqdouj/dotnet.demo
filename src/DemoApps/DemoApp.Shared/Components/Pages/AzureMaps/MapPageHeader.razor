@@ -1,4 +1,4 @@
-﻿@using Marqdouj.DotNet.AzureMaps.Map.Interop.Layers
+﻿@using Marqdouj.DotNet.AzureMaps.Map.Layers
 <FluentHeader Style="margin-bottom:5px;">
     @Header
     <FluentSpacer Width="10" />
@@ -44,7 +44,7 @@
     private string showHideNarrative => ShowNarrative ? "Hide Info" : "Show Info";
     private string? hRefDocs => LayerDef.ToHRefAzureDocs();
     private string? hRefExample => LayerDef?.ToHRefAddLayerExample();
-    private string hRefExampleLabel => $"{LayerDef?.Type} Layer Example";
+    private string hRefExampleLabel => $"{LayerDef?.LayerType} Layer Example";
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }

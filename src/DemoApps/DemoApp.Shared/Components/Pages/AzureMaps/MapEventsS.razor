@@ -4,8 +4,8 @@
 @using Marqdouj.DotNet.AzureMaps.Map.Events
 @using Marqdouj.DotNet.AzureMaps.Map.GeoJson
 @using Marqdouj.DotNet.AzureMaps.Map.Interop
-@using Marqdouj.DotNet.AzureMaps.Map.Interop.Layers
-@using Marqdouj.DotNet.AzureMaps.Map.Options
+@using Marqdouj.DotNet.AzureMaps.Map.Layers
+@using Marqdouj.DotNet.AzureMaps.Map.Configuration
 @using Marqdouj.DotNet.AzureMaps.UI.Components
 @using Marqdouj.DotNet.General
 @using Marqdouj.DotNet.Web.Components.FluentUI.Extensions
@@ -47,7 +47,7 @@
                       Events="@mapEvents.Items"
                       OnMapEventReady="OnMapEventReady"
                       OnMapEventMouse="OnMapEventMouse"
-                      Options="@options" />
+                      Options="@MapHelpers.GetDefaultCreateMapOptions()" />
         </FluentCard>
         <FluentCard>
             <FluentStack Orientation="Orientation.Vertical">
@@ -83,7 +83,7 @@
     private readonly string header = "Map Events";
     private string mapHeight = "400px";
     private string mapWidth = "100%";
-    private MapOptions options = MapHelpers.GetDefaultMapOptions(10);
+    private MapOptionsSet options = MapHelpers.GetDefaultSetMapOptions();
     private MapInterop? mapInterop;
     private bool disabled => overlay || mapInterop == null;
     private readonly EnumList<MapEventType> mapEvents = new();
@@ -93,7 +93,8 @@
     protected override void OnInitialized()
     {
         //First symbol.
-        ((CameraOptions)options.Camera!).Center = new Position(-122.18822, 47.63208);
+        var camera = options.Camera!.Camera!;
+        camera!.Center = new Position(-122.18822, 47.63208);
 
         //Mouse Events
         mapEvents.AddValues(

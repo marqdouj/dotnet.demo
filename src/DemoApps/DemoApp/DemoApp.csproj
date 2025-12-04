@@ -13,15 +13,19 @@
       <ReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths->'%(RootDir)%(Directory)%(Filename).xml')" Condition="Exists('%(RootDir)%(Directory)%(Filename).xml')" />
     </ItemGroup>
   </Target>
+
+  <ItemGroup>
+    <None Include="..\..\..\README.md" Link="README.md" />
+  </ItemGroup>
 	
   <ItemGroup>
-    <PackageReference Include="Marqdouj.DotNet.AzureMaps" Version="10.1.0" />
-    <PackageReference Include="Marqdouj.DotNet.AzureMaps.UI" Version="10.1.0" />
+    <PackageReference Include="Marqdouj.DotNet.AzureMaps" Version="10.2.0" />
+    <PackageReference Include="Marqdouj.DotNet.AzureMaps.UI" Version="10.2.0" />
     <PackageReference Include="Marqdouj.DotNet.General" Version="10.0.0" />
     <PackageReference Include="Marqdouj.DotNet.Web.Components" Version="10.1.0" />
-	<PackageReference Include="Marqdouj.DotNet.Web.Components.FluentUI" Version="10.0.1" />
-    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.13.1" />
-    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.13.1" />
+	<PackageReference Include="Marqdouj.DotNet.Web.Components.FluentUI" Version="10.0.2" />
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.13.2" />
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.13.2" />
   </ItemGroup>
 	
   <ItemGroup>

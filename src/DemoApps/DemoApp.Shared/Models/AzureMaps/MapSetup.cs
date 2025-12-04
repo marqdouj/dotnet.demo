@@ -1,10 +1,10 @@
 ﻿// For Azure Maps Anonymous authentication
 //using Microsoft.Identity.Client;
 using Marqdouj.DotNet.AzureMaps;
-using Marqdouj.DotNet.AzureMaps.Map;
-using Marqdouj.DotNet.AzureMaps.Map.Options;
+using Marqdouj.DotNet.AzureMaps.Map.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace DemoApp.Shared.Models.AzureMaps
 {
@@ -39,25 +39,26 @@ namespace DemoApp.Shared.Models.AzureMaps
 
         private static void ConfigureForSubscriptionKey(IConfiguration configuration, MapConfiguration config)
         {
-            config.AuthOptions.AuthType = AuthType.SubscriptionKey;
-            config.AuthOptions.SubscriptionKey = configuration["AzureMaps:SubscriptionKey"];
+            config.Authentication.Mode = MapAuthenticationMode.SubscriptionKey;
+            config.Authentication.SubscriptionKey = configuration["AzureMaps:SubscriptionKey"];
+            config.LogLevel = LogLevel.Trace;
         }
 
         //private static void ConfigureForAad(IConfiguration configuration, MapConfiguration config)
         //{
-        //    config.AuthOptions.AuthType = AuthType.Aad;
-        //    config.AuthOptions.AadAppId = configuration["AzureMaps:AadAppId"];
-        //    config.AuthOptions.AadTenant = configuration["AzureMaps:AadTenant"];
-        //    config.AuthOptions.ClientId = configuration["AzureMaps:ClientId"];
+        //    config.Authentication.Mode = MapAuthenticationMode.Aad;
+        //    config.Authentication.AadAppId = configuration["AzureMaps:AadAppId"];
+        //    config.Authentication.AadTenant = configuration["AzureMaps:AadTenant"];
+        //    config.Authentication.ClientId = configuration["AzureMaps:ClientId"];
         //}
 
         //private static void ConfigureForAnonymous(IConfiguration configuration, MapConfiguration config)
         //{
         //    //NOTE: See GetAccessToken().
-        //    config.AuthOptions.AuthType = AuthType.Anonymous;
-        //    config.AuthOptions.AadAppId = configuration["AzureMaps:AadAppId"];
-        //    config.AuthOptions.AadTenant = configuration["AzureMaps:AadTenant"];
-        //    config.AuthOptions.ClientId = configuration["AzureMaps:ClientId"];
+        //    config.Authentication.Mode = MapAuthenticationMode.Anonymous;
+        //    config.Authentication.AadAppId = configuration["AzureMaps:AadAppId"];
+        //    config.Authentication.AadTenant = configuration["AzureMaps:AadTenant"];
+        //    config.Authentication.ClientId = configuration["AzureMaps:ClientId"];
         //    clientSecret = configuration["AzureMaps:ClientSecret"] ?? "";
         //}
 

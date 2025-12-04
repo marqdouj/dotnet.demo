@@ -1,6 +1,6 @@
-﻿using Marqdouj.DotNet.AzureMaps.Map.Controls;
+﻿using Marqdouj.DotNet.AzureMaps.Map.Configuration;
+using Marqdouj.DotNet.AzureMaps.Map.Controls;
 using Marqdouj.DotNet.AzureMaps.Map.GeoJson;
-using Marqdouj.DotNet.AzureMaps.Map.Options;
 using Microsoft.FluentUI.AspNetCore.Components;
 
 namespace DemoApp.Shared.Components.Pages.AzureMaps
@@ -15,7 +15,7 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
                 PrimaryAction = "OK",
                 PrimaryActionEnabled = true,
                 SecondaryAction = "Cancel",
-                Width = "60%",
+                Width = "80%",
                 TrapFocus = true,
                 Modal = false,
                 PreventScroll = true
@@ -24,7 +24,7 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
             return parameters;
         }
 
-        public static MapOptions GetDefaultMapOptions(double? zoomTo = null)
+        public static MapOptions GetDefaultCreateMapOptions()
         {
             // Initialize map options with a specific camera position
             return new MapOptions
@@ -32,13 +32,29 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
                 Camera = new CameraOptions
                 {
                     Center = new Position(-122.33, 47.6), // (Seattle, WA)
-                    Zoom = zoomTo ?? 10.5,
+                    Zoom = 10.5,
                     Pitch = 0,
-                },
-                Style = new StyleOptions
+                }
+            };
+        }
+
+        public static MapOptionsSet GetDefaultSetMapOptions()
+        {
+            // Initialize map options with a specific camera position
+            return new MapOptionsSet
+            {
+                Camera = new CameraOptionsSet
                 {
-                    Style = MapStyle.Road,
+                    Camera = new CameraOptions
+                    {
+                        Center = new Position(-122.33, 47.6), // (Seattle, WA)
+                        Zoom = 10.5,
+                        Pitch = 0,
+                    },
                 },
+                Service = new(),
+                Style = new(),
+                UserInteraction = new()
             };
         }
 
