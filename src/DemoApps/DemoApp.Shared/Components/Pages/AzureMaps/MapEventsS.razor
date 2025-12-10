@@ -45,7 +45,7 @@
                       Width="@mapWidth"
                       Controls="@MapHelpers.GetDefaultControls()"
                       Events="@mapEvents.Items"
-                      OnMapEventReady="OnMapEventReady"
+                      OnMapReady="@OnMapReady"
                       OnMapEventMouse="OnMapEventMouse"
                       Options="@MapHelpers.GetDefaultCreateMapOptions()" />
         </FluentCard>
@@ -84,11 +84,11 @@
     private string mapHeight = "400px";
     private string mapWidth = "100%";
     private MapOptionsSet options = MapHelpers.GetDefaultSetMapOptions();
-    private MapInterop? mapInterop;
-    private bool disabled => overlay || mapInterop == null;
+    private bool disabled => overlay || mapContainer == null;
     private readonly EnumList<MapEventType> mapEvents = new();
     private readonly MouseDisplay mouseDisplay = new();
     private bool notificationsEnabled = true;
+    private IAzureMapContainer? mapContainer;
 
     protected override void OnInitialized()
     {
@@ -103,12 +103,12 @@
             MapEventType.MouseOut);
     }
 
-    private async Task OnMapEventReady(MapEventArgs e)
+    private async Task OnMapReady(IAzureMapContainer mapContainer)
     {
         try
         {
-            mapInterop = new MapInterop(JSRuntime, e.MapId);
-            await CreateSymbolLayer();
+            await Task.CompletedTask;
+            this.mapContainer = mapContainer;
         }
         catch (Exception ex)
         {
@@ -121,10 +121,10 @@
     {
         try
         {
-            if (mapInterop == null) return;
+            if (mapContainer == null) return;
 
             var layerDef = await MapLayerType.Symbol.GetDefaultLayerDef(DataService);
-            layerDef = await mapInterop.AddBasicMapLayer(DataService, layerDef);
+            layerDef = await mapContainer.AddBasicMapLayer(DataService, layerDef);
         }
         catch (Exception ex)
         {
@@ -162,10 +162,10 @@
     {
         try
         {
-            if (mapInterop == null) return;
+            if (mapContainer == null) return;
 
 			mouseDisplay.SetValues(null);
-            await mapInterop.Configuration.SetMapOptions(options);
+            await mapContainer.Configuration.SetMapOptions(options);
 			notificationsEnabled = true;
         }
         catch (Exception ex)

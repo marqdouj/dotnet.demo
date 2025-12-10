@@ -72,7 +72,7 @@
             <AzureMap Height="@mapHeight"
                       Width="@mapWidth"
                       Controls="@MapHelpers.GetDefaultControls()"
-                      OnMapEventReady="@OnMapEventReady"
+					  OnMapReady="@OnMapReady"
                       Options="@MapHelpers.GetDefaultCreateMapOptions()" />
         </FluentTab>
         <FluentTab Id="@tabSettings" Label="Settings">
@@ -98,19 +98,19 @@
 	private string? activeTab = tabMap;
 	private string mapHeight = "400px";
 	private string mapWidth = "100%";
-	private MapInterop? mapInterop;
 	private MapLayerDef? layerDef;
-	private bool disabled => overlay || mapInterop == null;
+	private bool disabled => overlay || mapContainer == null;
 	private bool isSymbolLayer => layerDef != null && layerDef.LayerType == MapLayerType.Symbol;
 	private bool isSymbolLayerDisabled => disabled || !isSymbolLayer;
 	private bool useUI = true;
+	private IAzureMapContainer? mapContainer;
 
-	private async Task OnMapEventReady(MapEventArgs e)
+	private async Task OnMapReady(IAzureMapContainer mapContainer)
 	{
 		try
 		{
 			await Task.CompletedTask;
-			mapInterop = new MapInterop(JSRuntime, e.MapId);
+			this.mapContainer = mapContainer;
 		}
 		catch (Exception ex)
 		{
@@ -132,7 +132,7 @@
 	{
 		try
 		{
-			if (mapInterop == null) return;
+			if (mapContainer == null) return;
 
 			var uiLayerDef = layerDef?.LayerType == layerType ? layerDef.GetClone() : await layerType.GetDefaultLayerDef(DataService);
 
@@ -150,7 +150,7 @@
 
 			await ResetMap();
 
-			layerDef = await mapInterop.AddBasicMapLayer(DataService, uiLayerDef);
+			layerDef = await mapContainer.AddBasicMapLayer(DataService, uiLayerDef);
 			activeTab = tabMap;
 
 			UpdateShowNarrative();
@@ -170,9 +170,9 @@
 	{
 		try
 		{
-			if (mapInterop == null) return;
+			if (mapContainer == null) return;
 
-			var camera = await mapInterop.Configuration.GetCamera();
+			var camera = await mapContainer.Configuration.GetCamera();
 			var uiModel = new CameraOptionsUIModel(XmlService) { Source = camera.ToCameraOptions() };
 			var result = await DialogService.ShowInputsDialog("Camera Settings", uiModel);
 
@@ -181,7 +181,7 @@
 
 			overlay = true;
 
-			await mapInterop.Configuration.SetCamera(uiModel.Source);
+			await mapContainer.Configuration.SetCamera(uiModel.Source);
 			activeTab = tabMap;
 
 			UpdateShowNarrative();
@@ -201,9 +201,9 @@
 	{
 		try
 		{
-			if (mapInterop == null) return;
+			if (mapContainer == null) return;
 
-			var style = await mapInterop.Configuration.GetStyle();
+			var style = await mapContainer.Configuration.GetStyle();
 			var uiModel = new StyleOptionsUIModel(XmlService) { Source = style };
 			var result = await DialogService.ShowInputsDialog("Style Settings", uiModel);
 
@@ -212,7 +212,7 @@
 
 			overlay = true;
 
-			await mapInterop.Configuration.SetStyle(uiModel.Source);
+			await mapContainer.Configuration.SetStyle(uiModel.Source);
 			activeTab = tabMap;
 
 			UpdateShowNarrative();
@@ -232,15 +232,15 @@
 	{
 		try
 		{
-			if (mapInterop == null) return;
+			if (mapContainer == null) return;
 
 			if (layerDef != null)
 			{
-				await mapInterop.Layers.RemoveLayer(layerDef);
+				await mapContainer.Layers.RemoveLayer(layerDef);
 				layerDef = null;
 			}
 
-			await mapInterop.Configuration.SetMapOptions(MapHelpers.GetDefaultSetMapOptions());
+			await mapContainer.Configuration.SetMapOptions(MapHelpers.GetDefaultSetMapOptions());
 		}
 		catch (Exception ex)
 		{
@@ -274,8 +274,8 @@
 							{ "title", "Current Location" },
 						}
 					};
-					await mapInterop!.Layers.AddMapFeature(feature, layerDef!.DataSource.Id, true);
-					await mapInterop.Configuration.ZoomTo(position, 15);
+					await mapContainer!.Layers.AddMapFeature(feature, layerDef!.DataSource.Id, true);
+					await mapContainer.Configuration.ZoomTo(position, 15);
 					ToastService.Info($"Current Location: {position}");
 				}
 				else

@@ -33,7 +33,7 @@
                       Height="@mapHeight"
                       Width="@mapWidth"
                       Controls="@controlsA"
-                      OnMapEventReady="@OnMapEventReady"
+                      OnMapReady="@OnMapReady"
                       Options="@MapHelpers.GetDefaultCreateMapOptions()" />
         </FluentStack>
 
@@ -45,7 +45,7 @@
                       Height="@mapHeight"
                       Width="@mapWidth"
                       Controls="@controlsB"
-                      OnMapEventReady="@OnMapEventReady"
+                      OnMapReady="@OnMapReady"
                       Options="@optionsB" />
         </FluentStack>
     </FluentStack>
@@ -67,8 +67,8 @@
     private MapOptions optionsB = MapHelpers.GetDefaultCreateMapOptions();
     private MapOptionsSet optionsSetA = MapHelpers.GetDefaultSetMapOptions();
     private MapOptionsSet optionsSetB = MapHelpers.GetDefaultSetMapOptions();
-    private MapInterop? mapInteropA;
-    private MapInterop? mapInteropB;
+    private IAzureMapContainer? mapInteropA;
+    private IAzureMapContainer? mapInteropB;
     private List<MapControl>? controlsA;
     private List<MapControl>? controlsB;
 
@@ -92,19 +92,18 @@
         };
     }
 
-    private async Task OnMapEventReady(MapEventArgs e)
+    private async Task OnMapReady(IAzureMapContainer mapContainer)
     {
         try
         {
             await Task.CompletedTask;
-
-            switch (e.MapId)
+            switch (mapContainer.MapId)
             {
                 case mapIdA:
-                    mapInteropA = new MapInterop(JSRuntime, e.MapId);
+                    mapInteropA = mapContainer;
                     break;
                 case mapIdB:
-                    mapInteropB = new MapInterop(JSRuntime, e.MapId);
+                    mapInteropB = mapContainer;
                     break;
             }
         }

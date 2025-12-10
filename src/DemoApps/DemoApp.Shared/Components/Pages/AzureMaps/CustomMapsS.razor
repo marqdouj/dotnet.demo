@@ -43,7 +43,7 @@
         <AzureMap Id="@MapId"
                   Height="@mapHeight"
                   Width="@mapWidth"
-                  OnMapEventReady="@OnMapEventReady"
+                  OnMapReady="@OnMapReady"
                   Options="@MapHelpers.GetDefaultCreateMapOptions()" />
     </FluentStack>
 </FluentLayout>
@@ -62,7 +62,7 @@
     private string mapWidth = "100%";
     private bool overlay;
     private bool disabled => overlay || mapInterop == null;
-    private MapInterop? mapInterop;
+    private IAzureMapContainer? mapInterop;
     private DemoCustomMaps? customMaps;
 
     protected override void OnInitialized()
@@ -70,12 +70,12 @@
         customMaps = new DemoCustomMaps(JSRuntime);
     }
 
-    private async Task OnMapEventReady(MapEventArgs e)
+    private async Task OnMapReady(IAzureMapContainer mapContainer)
     {
         try
         {
             await Task.CompletedTask;
-            mapInterop = new MapInterop(JSRuntime, e.MapId);
+            mapInterop = mapContainer;
         }
         catch (Exception ex)
         {
