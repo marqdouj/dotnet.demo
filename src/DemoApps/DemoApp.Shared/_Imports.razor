@@ -1,9 +1,29 @@
 ﻿@using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.Extensions.Logging
+@using Microsoft.JSInterop
 @using Microsoft.FluentUI.AspNetCore.Components
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
 @using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons
 @using DemoApp.Shared.Components.Layout
 @using DemoApp.Shared.Models
+@using DemoApp.Shared.Models.AzureMaps
+@using Marqdouj.DotNet.General
 @using Marqdouj.DotNet.General.Extensions
-@using Marqdouj.DotNet.Web.Components.FluentUI.Themes
+@using Marqdouj.DotNet.AzureMaps
+@using Marqdouj.DotNet.AzureMaps.Map.Common
+@using Marqdouj.DotNet.AzureMaps.Map.Configuration
+@using Marqdouj.DotNet.AzureMaps.Map.Controls
+@using Marqdouj.DotNet.AzureMaps.Map.Events
+@using Marqdouj.DotNet.AzureMaps.Map.GeoJson
+@using Marqdouj.DotNet.AzureMaps.Map.Interop
+@using Marqdouj.DotNet.AzureMaps.Map.Layers
+@using Marqdouj.DotNet.AzureMaps.UI.Components
+@using Marqdouj.DotNet.AzureMaps.UI.Models
+@using Marqdouj.DotNet.AzureMaps.UI.Models.Maps
+@using Marqdouj.DotNet.AzureMaps.UI.Models.Maps.Options
+@using Marqdouj.DotNet.AzureMaps.UI.Services
+@using Marqdouj.DotNet.Web.Components.Css
+@using Marqdouj.DotNet.Web.Components.FluentUI.Extensions
+@using Marqdouj.DotNet.Web.Components.FluentUI.Themes 
+@using Marqdouj.DotNet.Web.Components.Services

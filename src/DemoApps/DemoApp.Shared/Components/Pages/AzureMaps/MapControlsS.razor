@@ -1,9 +1,4 @@
-﻿@using Marqdouj.DotNet.AzureMaps
-@using Marqdouj.DotNet.AzureMaps.Map.Controls
-@using Marqdouj.DotNet.AzureMaps.Map.Interop
-@using Marqdouj.DotNet.Web.Components.FluentUI.Extensions
-@using Microsoft.Extensions.Logging
-@inject ILogger<MapControlsS> Logger
+﻿@inject ILogger<MapControlsS> Logger
 @inject IToastService ToastService
 
 <FluentLayout>
@@ -140,11 +135,5 @@
             await mapContainer!.Maps.AddControls(items);
             vm.Loaded = true;
         }
-    }
-
-    private class MapControlViewModel(MapControl control)
-    {
-        public MapControl Control { get; set; } = control;
-        public bool Loaded { get; set; }
     }
 }

@@ -41,6 +41,7 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
         }
 
         public static string ToMapPageSource(this string name) => HRefRepository.Demo.GitHubSrcItem("DemoApp.Shared", $"Components/Pages/AzureMaps/{name}.razor");
+        public static string ToMapEventsPageSource(this string name) => HRefRepository.Demo.GitHubSrcItem("DemoApp.Shared", $"Components/Pages/AzureMaps/Events/{name}.razor");
         public static string ToMapCustomSource(this string name) => HRefRepository.Demo.GitHubSrcItem("DemoApp.CustomMaps", name);
 
         public static string CodeUrl(this HRefSource source, string path)

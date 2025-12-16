@@ -49,11 +49,14 @@
 
             <FluentNavGroup Title="Azure Maps" Icon="@(new Icons.Regular.Size20.GroupList())" IconColor="Color.Accent">
                 <FluentNavLink Href="pkg-azure-maps" Icon="@(new Icons.Regular.Size20.Notebook())" IconColor="Color.Accent">Details</FluentNavLink>
-                <FluentNavLink Href="basic-maps" Icon="@(new Icons.Regular.Size20.Map())" IconColor="Color.Accent">Basic Maps</FluentNavLink>
-                <FluentNavLink Href="custom-maps" Icon="@(new Icons.Regular.Size20.Map())" IconColor="Color.Accent">Custom Maps</FluentNavLink>
-                <FluentNavLink Href="map-controls" Icon="@(new Icons.Regular.Size20.Map())" IconColor="Color.Accent">Map Controls</FluentNavLink>
-                <FluentNavLink Href="map-events" Icon="@(new Icons.Regular.Size20.Map())" IconColor="Color.Accent">Map Events</FluentNavLink>
-                <FluentNavLink Href="multiple-maps" Icon="@(new Icons.Regular.Size20.Multiplier2x())" IconColor="Color.Accent">Multiple Maps</FluentNavLink>
+                <FluentNavLink Href="basic-maps" Icon="@(new Icons.Regular.Size20.Map())" IconColor="Color.Accent">Basic</FluentNavLink>
+                <FluentNavLink Href="map-controls" Icon="@(new Icons.Regular.Size20.Map())" IconColor="Color.Accent">Controls</FluentNavLink>
+                <FluentNavLink Href="custom-maps" Icon="@(new Icons.Regular.Size20.Map())" IconColor="Color.Accent">Custom</FluentNavLink>
+                <FluentNavGroup Title="Events" Icon="@(new Icons.Regular.Size20.GroupList())">
+                    <FluentNavLink Href="map-events-basic" Icon="@(new Icons.Regular.Size20.Map())" IconColor="Color.Accent">Basic</FluentNavLink>
+                    <FluentNavLink Href="map-events-controls" Icon="@(new Icons.Regular.Size20.Map())" IconColor="Color.Accent">Controls</FluentNavLink>
+                </FluentNavGroup>
+                <FluentNavLink Href="multiple-maps" Icon="@(new Icons.Regular.Size20.Multiplier2x())" IconColor="Color.Accent">Multiple</FluentNavLink>
             </FluentNavGroup>
 
             @if (isAspire)
