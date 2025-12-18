@@ -46,7 +46,7 @@
 
 
 @code {
-    private string hRefSource => nameof(BasicEventsS).ToMapEventsPageSource();
+    private string hRefSource => nameof(MapEventsS).ToMapEventsPageSource();
     private IAzureMapContainer? mapContainer;
     private string mapHeight = "400px";
     private string mapWidth = "100%";
@@ -87,6 +87,7 @@
         {
             if (mapContainer == null) return;
 
+            await SelectAllEvents(false);
             await mapContainer.Configuration.SetMapOptions(MapHelpers.GetDefaultSetMapOptions());
 
         }

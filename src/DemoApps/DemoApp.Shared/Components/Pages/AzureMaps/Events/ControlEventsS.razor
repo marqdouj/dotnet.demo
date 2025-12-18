@@ -47,7 +47,7 @@
 </style>
 
 @code {
-    private string hRefSource => nameof(BasicEventsS).ToMapEventsPageSource();
+    private string hRefSource => nameof(ControlEventsS).ToMapEventsPageSource();
     private bool overlay;
     private bool disabled => overlay || mapContainer == null;
     private bool disableStyleEvents => disabled || !styleControl.Loaded;
