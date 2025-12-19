@@ -17,7 +17,7 @@
     <FluentToolbar>
         <FluentButton IconStart="@(new Icons.Regular.Size20.ArrowReset())" Title="Reset Map" OnClick="@ResetMap" />
         <FluentSpacer Width="10"/>
-        <FluentLabel>Subscribe/Unsubscribe Events =>></FluentLabel>
+        <FluentLabel>Events:</FluentLabel>
         <FluentButton IconStart="@(new Icons.Regular.Size20.CheckboxChecked())" Title="Subscribe" OnClick="@(() => SelectAllEvents(true))" />
         <FluentButton IconStart="@(new Icons.Regular.Size20.CheckboxUnchecked())" Title="Unsubscribe" OnClick="@(() => SelectAllEvents(false))" />
         </FluentToolbar>
