@@ -1,5 +1,6 @@
 ﻿using DemoApp.Shared.Models.AzureMaps;
 using Marqdouj.DotNet.AzureMaps.Map.Common;
+using Marqdouj.DotNet.AzureMaps.Map.Events;
 using Marqdouj.DotNet.AzureMaps.Map.GeoJson;
 using Marqdouj.DotNet.AzureMaps.Map.Interop;
 using Marqdouj.DotNet.AzureMaps.Map.Layers;
@@ -98,25 +99,25 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
             return layerDef;
         }
 
-        public static async Task<MapLayerDef> AddBasicMapLayer(this IAzureMapContainer mapInterop, IMapDataService dataService, MapLayerDef layerDef, bool zoomTo = true)
+        public static async Task<MapLayerDef> AddBasicMapLayer(this IAzureMapContainer mapInterop, IMapDataService dataService, MapLayerDef layerDef, IEnumerable<MapEventDef>? events = null, bool zoomTo = true)
         {
             return layerDef.LayerType switch
             {
-                MapLayerType.Bubble => await AddBubbleLayer(mapInterop, dataService, (BubbleLayerDef)layerDef, zoomTo),
-                MapLayerType.HeatMap => await AddHeatMapLayer(mapInterop, (HeatMapLayerDef)layerDef, zoomTo),
-                MapLayerType.Image => await AddImageLayer(mapInterop, (ImageLayerDef)layerDef, zoomTo),
-                MapLayerType.Line => await AddLineLayer(mapInterop, dataService, (LineLayerDef)layerDef, zoomTo),
-                MapLayerType.Polygon => await AddPolygonLayer(mapInterop, dataService, (PolygonLayerDef)layerDef, zoomTo),
-                MapLayerType.PolygonExtrusion => await AddPolygonExtLayer(mapInterop, dataService, (PolygonExtLayerDef)layerDef, zoomTo),
-                MapLayerType.Symbol => await AddSymbolLayer(mapInterop, dataService, (SymbolLayerDef)layerDef, zoomTo),
-                MapLayerType.Tile => await AddTileLayer(mapInterop, dataService, (TileLayerDef)layerDef, zoomTo),
+                MapLayerType.Bubble => await AddBubbleLayer(mapInterop, dataService, (BubbleLayerDef)layerDef, zoomTo, events),
+                MapLayerType.HeatMap => await AddHeatMapLayer(mapInterop, (HeatMapLayerDef)layerDef, zoomTo, events),
+                MapLayerType.Image => await AddImageLayer(mapInterop, (ImageLayerDef)layerDef, zoomTo, events),
+                MapLayerType.Line => await AddLineLayer(mapInterop, dataService, (LineLayerDef)layerDef, zoomTo, events),
+                MapLayerType.Polygon => await AddPolygonLayer(mapInterop, dataService, (PolygonLayerDef)layerDef, zoomTo, events),
+                MapLayerType.PolygonExtrusion => await AddPolygonExtLayer(mapInterop, dataService, (PolygonExtLayerDef)layerDef, zoomTo, events),
+                MapLayerType.Symbol => await AddSymbolLayer(mapInterop, dataService, (SymbolLayerDef)layerDef, zoomTo, events),
+                MapLayerType.Tile => await AddTileLayer(mapInterop, dataService, (TileLayerDef)layerDef, zoomTo, events),
                 _ => throw new ArgumentOutOfRangeException(nameof(layerDef.LayerType)),
             };
         }
 
-        private static async Task<MapLayerDef> AddBubbleLayer(IAzureMapContainer mapInterop, IMapDataService dataService, BubbleLayerDef layerDef, bool zoomTo = true)
+        private static async Task<MapLayerDef> AddBubbleLayer(IAzureMapContainer mapInterop, IMapDataService dataService, BubbleLayerDef layerDef, bool zoomTo = true, IEnumerable<MapEventDef>? events = null)
         {
-            await mapInterop.Layers.CreateLayer(layerDef);
+            await mapInterop.Layers.CreateLayer(layerDef, events);
 
             var data = await dataService.GetBubbleLayerData();
             MapFeatureDef featureDef = new(new MultiPoint(data))
@@ -135,9 +136,9 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
             return layerDef;
         }
 
-        private static async Task<MapLayerDef> AddHeatMapLayer(IAzureMapContainer mapInterop, HeatMapLayerDef layerDef, bool zoomTo = true)
+        private static async Task<MapLayerDef> AddHeatMapLayer(IAzureMapContainer mapInterop, HeatMapLayerDef layerDef, bool zoomTo = true, IEnumerable<MapEventDef>? events = null)
         {
-            await mapInterop.Layers.CreateLayer(layerDef);
+            await mapInterop.Layers.CreateLayer(layerDef, events);
 
             if (zoomTo)
                 await mapInterop.Configuration.ZoomTo(new Position(-122.33, 47.6), 1);
@@ -145,9 +146,9 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
             return layerDef;
         }
 
-        private static async Task<MapLayerDef> AddImageLayer(IAzureMapContainer mapInterop, ImageLayerDef layerDef, bool zoomTo = true)
+        private static async Task<MapLayerDef> AddImageLayer(IAzureMapContainer mapInterop, ImageLayerDef layerDef, bool zoomTo = true, IEnumerable<MapEventDef>? events = null)
         {
-            await mapInterop.Layers.CreateLayer(layerDef);
+            await mapInterop.Layers.CreateLayer(layerDef, events);
 
             if (zoomTo)
                 await mapInterop.Configuration.ZoomTo(new Position(-74.172363, 40.735657), 11);
@@ -155,9 +156,9 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
             return layerDef;
         }
 
-        private static async Task<MapLayerDef> AddLineLayer(IAzureMapContainer mapInterop, IMapDataService dataService, LineLayerDef layerDef, bool zoomTo)
+        private static async Task<MapLayerDef> AddLineLayer(IAzureMapContainer mapInterop, IMapDataService dataService, LineLayerDef layerDef, bool zoomTo, IEnumerable<MapEventDef>? events = null)
         {
-            await mapInterop.Layers.CreateLayer(layerDef);
+            await mapInterop.Layers.CreateLayer(layerDef, events);
 
             var data = await dataService.GetLineLayerData();
             var feature = new MapFeatureDef(new LineString(data))
@@ -177,9 +178,9 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
             return layerDef;
         }
 
-        private static async Task<MapLayerDef> AddPolygonLayer(IAzureMapContainer mapInterop, IMapDataService dataService, PolygonLayerDef layerDef, bool zoomTo)
+        private static async Task<MapLayerDef> AddPolygonLayer(IAzureMapContainer mapInterop, IMapDataService dataService, PolygonLayerDef layerDef, bool zoomTo, IEnumerable<MapEventDef>? events = null)
         {
-            await mapInterop.Layers.CreateLayer(layerDef);
+            await mapInterop.Layers.CreateLayer(layerDef, events);
 
             var data = await dataService.GetPolygonLayerData();
             var feature = new MapFeatureDef(new Polygon(data))
@@ -200,9 +201,9 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
             return layerDef;
         }
 
-        private static async Task<MapLayerDef> AddPolygonExtLayer(IAzureMapContainer mapInterop, IMapDataService dataService, PolygonExtLayerDef layerDef, bool zoomTo)
+        private static async Task<MapLayerDef> AddPolygonExtLayer(IAzureMapContainer mapInterop, IMapDataService dataService, PolygonExtLayerDef layerDef, bool zoomTo, IEnumerable<MapEventDef>? events = null)
         {
-            await mapInterop.Layers.CreateLayer(layerDef);
+            await mapInterop.Layers.CreateLayer(layerDef, events);
 
             var data = await dataService.GetPolygonExtLayerData();
             var feature = new MapFeatureDef(new Polygon(data))
@@ -227,9 +228,9 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
             return layerDef;
         }
 
-        private static async Task<MapLayerDef> AddSymbolLayer(IAzureMapContainer mapInterop, IMapDataService dataService, SymbolLayerDef layerDef, bool zoomTo)
+        private static async Task<MapLayerDef> AddSymbolLayer(IAzureMapContainer mapInterop, IMapDataService dataService, SymbolLayerDef layerDef, bool zoomTo, IEnumerable<MapEventDef>? events = null)
         {
-            await mapInterop.Layers.CreateLayer(layerDef);
+            await mapInterop.Layers.CreateLayer(layerDef, events);
 
             var data = await dataService.GetSymbolLayerData();
 
@@ -253,9 +254,9 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
             return layerDef;
         }
 
-        private static async Task<MapLayerDef> AddTileLayer(IAzureMapContainer mapInterop, IMapDataService dataService, TileLayerDef layerDef, bool zoomTo)
+        private static async Task<MapLayerDef> AddTileLayer(IAzureMapContainer mapInterop, IMapDataService dataService, TileLayerDef layerDef, bool zoomTo, IEnumerable<MapEventDef>? events = null)
         {
-            await mapInterop.Layers.CreateLayer(layerDef);
+            await mapInterop.Layers.CreateLayer(layerDef, events);
 
             if (zoomTo)
                 await mapInterop.Configuration.ZoomTo(new Position(-122.426181, 47.608070), 10.75);
