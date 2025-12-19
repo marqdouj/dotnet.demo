@@ -20,7 +20,7 @@
 	
   <ItemGroup>
     <PackageReference Include="Marqdouj.DotNet.AzureMaps" Version="10.3.8" />
-    <PackageReference Include="Marqdouj.DotNet.AzureMaps.UI" Version="10.3.8" />
+    <PackageReference Include="Marqdouj.DotNet.AzureMaps.UI" Version="10.3.9" />
     <PackageReference Include="Marqdouj.DotNet.General" Version="10.0.0" />
     <PackageReference Include="Marqdouj.DotNet.Web.Components" Version="10.1.0" />
 	<PackageReference Include="Marqdouj.DotNet.Web.Components.FluentUI" Version="10.0.2" />
