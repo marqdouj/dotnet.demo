@@ -36,6 +36,7 @@
 		<FluentSpacer Width="8" />
 		<FluentButton Disabled="@disabled" IconStart="@(new Icons.Regular.Size20.Camera())" Title="Camera" OnClick="@SetMapCameraOptions" />
 		<FluentButton Disabled="@disabled" IconStart="@(new Icons.Regular.Size20.TextEditStyle())" Title="Style" OnClick="@SetMapStyleOptions" />
+		<FluentButton Disabled="@disabled" IconStart="@(new Icons.Regular.Size20.VehicleCar())" Title="Traffic" OnClick="@SetMapTrafficOptions" />
 		<FluentSpacer Width="8" />
 		<FluentButton Disabled="@isSymbolLayerDisabled" IconStart="@(new Icons.Regular.Size20.GlobeSearch())" Title="Get Current Location" OnClick="@GetCurrentPosition" />
 		@{
@@ -194,6 +195,37 @@
 			overlay = true;
 
 			await mapContainer.Configuration.SetStyle(uiModel.Source);
+			activeTab = tabMap;
+
+			UpdateShowNarrative();
+		}
+		catch (Exception ex)
+		{
+			Logger.LogError(ex, null);
+			ToastService.Error(ex);
+		}
+		finally
+		{
+			overlay = false;
+		}
+	}
+
+	private async Task SetMapTrafficOptions()
+	{
+		try
+		{
+			if (mapContainer == null) return;
+
+			var traffic = await mapContainer.Maps.GetTraffic();
+			var uiModel = new TrafficOptionsUIModel(XmlService) { Source = traffic };
+			var result = await DialogService.ShowInputsDialog("Traffic Settings", uiModel);
+
+			if (result.Cancelled)
+				return;
+
+			overlay = true;
+
+			await mapContainer.Maps.SetTraffic(uiModel.Source);
 			activeTab = tabMap;
 
 			UpdateShowNarrative();
