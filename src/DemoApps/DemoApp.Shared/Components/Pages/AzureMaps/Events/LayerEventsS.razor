@@ -9,7 +9,8 @@
         <FluentLabel>
             This example demonstrates dynamically adding/removing layer (and it's DataSource ) events.
             <br /><br />
-            When a subscribed event is fired a notification will be written to the <CodeText>Console</CodeText>.
+            When a subscribed event is fired a notification will be written to the <CodeText>Console</CodeText>
+            and the last 20 events to the <CodeText>Event Viewer</CodeText> below the map.
             <br />
             NOTE: 'PreventDefault' is set to 'true' for all layer events (where applicable).
             <br /><br />
@@ -27,25 +28,29 @@
         <FluentCheckbox @bind-Value:get="@layerLoaded" @bind-Value:set="OnLayerCheckedChanged">Add/Remove Layer</FluentCheckbox>
     </FluentToolbar>
 
-    <FluentStack>
-        <FluentCard Height="@mapHeight" Width="300px" Style="overflow:auto">
-            <div>
-                <FluentStack Orientation="Orientation.Vertical">
-                    @foreach (var item in layerEvents)
-                    {
-                        <FluentCheckbox @bind-Value:get="@item.IsChecked" @bind-Value:set="@((e) => OnMapEventsCheckedChanged(e, item.Type))">@item.Name</FluentCheckbox>
-                    }
-                </FluentStack>
-            </div>
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentStack>
+            <FluentCard Height="@mapHeight" Width="300px" Style="overflow:auto">
+                <div>
+                    <FluentStack Orientation="Orientation.Vertical">
+                        @foreach (var item in layerEvents)
+                        {
+                            <FluentCheckbox @bind-Value:get="@item.IsChecked" @bind-Value:set="@((e) => OnMapEventsCheckedChanged(e, item.Type))">@item.Name</FluentCheckbox>
+                        }
+                    </FluentStack>
+                </div>
 
-        </FluentCard>
-        <FluentCard Height="@mapHeight" Width="@mapWidth">
-            <AzureMap Id="@mapId"
-                      OnMapEventAny="@OnMapEventAny"
-                      Controls="@MapHelpers.GetDefaultControls()"
-                      OnMapReady="@OnMapReady"
-                      Options="@MapHelpers.GetDefaultCreateMapOptions()" />
-        </FluentCard>
+            </FluentCard>
+            <FluentCard Height="@mapHeight" Width="@mapWidth">
+                <AzureMap Id="@mapId"
+                          OnMapEventAny="@OnMapEventAny"
+                          Controls="@MapHelpers.GetDefaultControls()"
+                          OnMapReady="@OnMapReady"
+                          Options="@MapHelpers.GetDefaultCreateMapOptions()" />
+            </FluentCard>
+        </FluentStack>
+        <FluentLabel>Marker Events:</FluentLabel>
+        <EventViewer Events="@events" />
     </FluentStack>
 </FluentLayout>
 
@@ -53,9 +58,10 @@
 @code {
     private string hRefSource => nameof(LayerEventsS).ToMapEventsPageSource();
     private IAzureMapContainer? mapContainer;
-    private string mapHeight = "400px";
+    private string mapHeight = "300px";
     private string mapWidth = "100%";
     private string mapId = "layerEvents"; //Optional; used here in demo to shorten the Id when wrting to the Console.
+    private List<MapEventArgsViewModel> events = new();
     private readonly List<MapEventViewModel> layerEvents
         = MapEventTarget.Layer.GetMapEventDefs().Select(e => new MapEventViewModel(e)).ToList(); 
     private MapLayerDef? layerDef;
@@ -88,6 +94,8 @@
         {
             if (mapContainer == null) return;
 
+            await SelectAllEvents(false);
+            events.Clear();
             await RemoveLayer();
             await mapContainer.Configuration.SetMapOptions(MapHelpers.GetDefaultSetMapOptions());
 
@@ -103,6 +111,10 @@
     {
         try
         {
+            events.Insert(0, new MapEventArgsViewModel(args));
+            if (events.Count > 20)
+                events = events.Take(20).ToList();
+
             Console.WriteLine($"OnMapEventAny: {args}");
             Console.WriteLine();
         }
