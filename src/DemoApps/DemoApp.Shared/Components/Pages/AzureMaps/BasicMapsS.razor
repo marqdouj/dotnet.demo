@@ -287,7 +287,7 @@
 							{ "title", "Current Location" },
 						}
 					};
-					await mapContainer!.Layers.AddMapFeature(feature, layerDef!.DataSource.Id, true);
+					await mapContainer!.Layers.AddMapFeature(feature, layerDef!.DataSource.Id!, true);
 					await mapContainer.Configuration.ZoomTo(position, 15);
 					ToastService.Info($"Current Location: {position}");
 				}

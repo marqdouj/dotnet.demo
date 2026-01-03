@@ -128,7 +128,7 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
                         { "demo", true },
                     }
             };
-            await mapInterop.Layers.AddMapFeature(featureDef, layerDef.DataSource.Id);
+            await mapInterop.Layers.AddMapFeature(featureDef, layerDef.DataSource.Id!);
 
             if (zoomTo)
                 await mapInterop.Configuration.ZoomTo(data[0], 11);
@@ -170,7 +170,7 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
                 }
             };
 
-            await mapInterop.Layers.AddMapFeature(feature, layerDef.DataSource.Id);
+            await mapInterop.Layers.AddMapFeature(feature, layerDef.DataSource.Id!);
 
             if (zoomTo)
                 await mapInterop.Configuration.ZoomTo(data[0], 10);
@@ -193,7 +193,7 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
                 AsShape = true
             };
 
-            await mapInterop.Layers.AddMapFeature(feature, layerDef.DataSource.Id);
+            await mapInterop.Layers.AddMapFeature(feature, layerDef.DataSource.Id!);
 
             if (zoomTo)
                 await mapInterop.Configuration.ZoomTo(data[0][0], 11);
@@ -216,7 +216,7 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
                 AsShape = true
             };
 
-            await mapInterop.Layers.AddMapFeature(feature, layerDef.DataSource.Id);
+            await mapInterop.Layers.AddMapFeature(feature, layerDef.DataSource.Id!);
 
             if (zoomTo)
                 await mapInterop.Configuration.ZoomTo(data[0][0], 11);
@@ -245,7 +245,7 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
                         { "demo", true },
                     }
                 };
-                await mapInterop.Layers.AddMapFeature(feature, layerDef.DataSource.Id);
+                await mapInterop.Layers.AddMapFeature(feature, layerDef.DataSource.Id!);
             }
 
             if (zoomTo)
