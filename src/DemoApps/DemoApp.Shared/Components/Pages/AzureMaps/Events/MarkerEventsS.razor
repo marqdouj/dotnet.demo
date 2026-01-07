@@ -75,6 +75,15 @@
         }
     };
 
+    protected override void OnInitialized()
+    {
+        //These events are listed in the Azure Maps SDK, however even in the SDK samples the events don't work.
+        //I've removed them for this demo.
+        markerEvents.Remove(markerEvents.First(e => e.Type == MapEventType.KeyDown));
+        markerEvents.Remove(markerEvents.First(e => e.Type == MapEventType.KeyPress));
+        markerEvents.Remove(markerEvents.First(e => e.Type == MapEventType.KeyUp));
+    }
+
     private async Task OnMapReady(IAzureMapContainer mapContainer)
     {
         try
