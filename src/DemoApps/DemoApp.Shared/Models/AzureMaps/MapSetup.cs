@@ -5,6 +5,7 @@ using Marqdouj.DotNet.AzureMaps.Map.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.JSInterop;
 
 namespace DemoApp.Shared.Models.AzureMaps
 {
@@ -14,6 +15,7 @@ namespace DemoApp.Shared.Models.AzureMaps
         //private static string clientSecret = "";
         //private static readonly string authorityFormat = "https://login.microsoftonline.com/{0}/oauth2/v2.0";
         //private static readonly string graphScope = "https://atlas.microsoft.com/.default";
+        //private static string? sasToken; //Used only for demo purposes; do not do this in production.
 
         public static IServiceCollection AddMapConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
@@ -30,6 +32,7 @@ namespace DemoApp.Shared.Models.AzureMaps
             mapConfiguration = services.AddMarqdoujAzureMaps(config =>
             {
                 ConfigureForSubscriptionKey(configuration, config);
+                //ConfigureForSasToken(configuration, config);
                 //ConfigureForAad(configuration, config);
                 //ConfigureForAnonymous(configuration, config);
             });
@@ -43,6 +46,29 @@ namespace DemoApp.Shared.Models.AzureMaps
             config.Authentication.SubscriptionKey = configuration["AzureMaps:SubscriptionKey"];
             config.LogLevel = LogLevel.Trace;
         }
+
+        //private static void ConfigureForSasToken(IConfiguration configuration, MapConfiguration config)
+        //{
+        //    config.Authentication.Mode = MapAuthenticationMode.Sas;
+        //    sasToken = configuration["AzureMaps:SasToken"];
+
+        //    //Optional settings:
+        //    config.LogLevel = LogLevel.Trace;
+        //}
+
+        /// <summary>
+        /// Only used for SasToken authentication.
+        /// Requires token callback be configured in App.razor.
+        /// </summary>
+        /// <returns></returns>
+        //[JSInvokable]
+        //public static async Task<string?> GetSasToken()
+        //{
+        //    //TODO: Implement logic to generate SasToken.
+        //    // For the purpose of testing, I manually generate SasToken (via Azure Maps Account/Shared Access Signature)
+        //    // and add it to my User Secrets.
+        //    return sasToken;
+        //}
 
         //private static void ConfigureForAad(IConfiguration configuration, MapConfiguration config)
         //{
