@@ -50,6 +50,11 @@ namespace DemoApp.Shared.Models.AzureMaps
         //private static void ConfigureForSasToken(IConfiguration configuration, MapConfiguration config)
         //{
         //    config.Authentication.Mode = MapAuthenticationMode.Sas;
+
+        //    //If provided, do do not need to configure GetSasToken callback in App.Razor
+        //    //config.Authentication.SasTokenUrl = "[YOUR SAS TOKEN URL]";
+
+        //    //For demo only, do not do this in production.
         //    sasToken = configuration["AzureMaps:SasToken"];
 
         //    //Optional settings:
