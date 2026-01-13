@@ -5,7 +5,6 @@ using Marqdouj.DotNet.AzureMaps.Map.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.JSInterop;
 
 namespace DemoApp.Shared.Models.AzureMaps
 {

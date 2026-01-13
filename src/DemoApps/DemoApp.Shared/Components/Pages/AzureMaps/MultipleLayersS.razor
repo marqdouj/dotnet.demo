@@ -1,0 +1,233 @@
+﻿@inject ILogger<MultipleLayersS> Logger
+@inject IToastService ToastService
+@inject IDialogService DialogService
+@inject IMapDataService DataService
+@inject IGeolocationService GeolocationService
+@inject IAzureMapsXmlService XmlService
+
+<PageTitle>Layers</PageTitle>
+
+<FluentLayout>
+	<MapPageHeader Header="Layers" LayerDef="null" HRefSource="@hRefSource" @bind-ShowNarrative="@showNarrative">
+		<FluentLabel>
+			<FluentLabel>
+				This example demonstrates managing a collection of layers.
+				<br /><br />
+				The <CodeText>GeolocationManager</CodeText> is used to manage the layers for adding the user's current geolocation.
+			</FluentLabel>
+			<br />
+		</FluentLabel>
+	</MapPageHeader>
+
+	<FluentToolbar>
+		<FluentButton Disabled="@disabled" IconStart="@(new Icons.Regular.Size20.ArrowReset())" Title="Reset Map" OnClick="@ResetMap" />
+		<FluentSpacer Width="8" />
+		<FluentButton Disabled="@disabled" IconStart="@(new Icons.Regular.Size20.GlobeSearch())" Title="Get Current Location" OnClick="@GetCurrentPosition" />
+	</FluentToolbar>
+
+	<FluentStack>
+		<FluentCard Height="@mapHeight" Width="300px" Style="overflow:auto">
+			<div>
+				<FluentStack Orientation="Orientation.Vertical">
+					@foreach (var vm in mapLayers)
+					{
+						<FluentStack>
+							<FluentCheckbox Disabled="@disabled" @bind-Value:get="@vm.IsLoaded" @bind-Value:set="@(e => OnCheckedChanged(e, vm.LayerDef.LayerType))">@vm.LayerDef.LayerType</FluentCheckbox>
+							@if (vm.ZoomTo != null)
+							{
+								<FluentButton Disabled="@vm.IsNotLoaded" IconStart="@(new Icons.Regular.Size20.ZoomIn())" Title="Zoom To" OnClick="@(() => ZoomToLayer(vm))" />
+							}
+						</FluentStack>
+					}
+				</FluentStack>
+			</div>
+
+		</FluentCard>
+		<FluentCard Height="@mapHeight" Width="@mapWidth">
+			<AzureMap Height="@mapHeight"
+					  Width="@mapWidth"
+					  Controls="@MapHelpers.GetDefaultControls()"
+					  OnMapReady="@OnMapReady"
+					  Options="@MapHelpers.GetDefaultCreateMapOptions()" />
+		</FluentCard>
+	</FluentStack>
+</FluentLayout>
+
+<FluentOverlay @bind-Visible="@overlay"
+			   Transparent="false">
+	<FluentProgressRing />
+</FluentOverlay>
+
+@code {
+	private bool overlay;
+	private bool showNarrative = true;
+	private bool showNarrativeFirstTime = true;
+	private bool disabled => overlay || mapContainer == null;
+	private string hRefSource => nameof(MultipleLayersS).ToMapPageSource();
+	private string mapHeight = "400px";
+	private string mapWidth = "100%";
+	private IAzureMapContainer? mapContainer;
+	private List<MapLayerViewModel> mapLayers = new();
+	private readonly GeolocationManager geolocationManager = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		mapLayers = await LayerExtensions.GetLayerViewModels(DataService);
+	}
+
+	private async Task OnMapReady(IAzureMapContainer mapContainer)
+	{
+		try
+		{
+			await Task.CompletedTask;
+			this.mapContainer = mapContainer;
+		}
+		catch (Exception ex)
+		{
+			Logger.LogError(ex, null);
+			ToastService.Error(ex);
+		}
+	}
+
+	private async Task ResetMap()
+	{
+		try
+		{
+			if (mapContainer == null) return;
+
+			await geolocationManager.RemoveLayers(mapContainer);
+
+			if (!mapLayers.Any()) return;
+
+			await mapContainer.Layers.RemoveLayers(mapLayers.Select(e => e.LayerDef));
+
+			foreach (var layer in mapLayers)
+				layer.IsLoaded = false;
+
+			await mapContainer.Configuration.SetMapOptions(MapHelpers.GetDefaultSetMapOptions());
+		}
+		catch (Exception ex)
+		{
+			Logger.LogError(ex, null);
+			ToastService.Error(ex);
+		}
+	}
+
+	private async Task GetCurrentPosition()
+	{
+		try
+		{
+			if (mapContainer == null) return;
+
+			overlay = true;
+
+			var geolocation = await GeolocationService.GetCurrentPosition();
+
+			if (geolocation != null)
+			{
+				if (geolocation.IsSuccess)
+				{
+					var coordinates = geolocation.Position!.Coords!;
+					var position = new Position(coordinates.Longitude, coordinates.Latitude) { Accuracy = geolocation.Position.Coords?.Accuracy };
+					if (!geolocationManager.LayersAdded)
+						await geolocationManager.AddLayers(mapContainer);
+					await geolocationManager.Clear(mapContainer);
+					await geolocationManager.AddPosition(mapContainer, position);
+
+
+					await mapContainer.Configuration.ZoomTo(position, 15);
+				}
+				else
+				{
+					var errMsg = $"Geolocation service failed. {geolocation.Error?.Message}";
+					Logger?.LogError(errMsg);
+					ToastService?.Error(errMsg);
+				}
+			}
+			else
+			{
+				var warnMsg = $"Geolocation service returned null.";
+				Logger?.LogWarning(warnMsg);
+				ToastService?.Warning(warnMsg);
+			}
+		}
+		catch (Exception ex)
+		{
+			Logger.LogError(ex, null);
+			ToastService.Error(ex);
+		}
+		finally
+		{
+			overlay = false;
+		}
+	}
+
+	private async Task ZoomToLayer(MapLayerViewModel vm)
+	{
+		try
+		{
+			if (mapContainer == null) return;
+			if (!vm.IsLoaded) return;
+
+			overlay = true;
+			await mapContainer.Configuration.ZoomTo(vm.ZoomTo!, vm.ZoomLevel);
+		}
+		catch (Exception ex)
+		{
+			Logger.LogError(ex, null);
+			ToastService.Error(ex);
+		}
+		finally
+		{
+			overlay = false;
+		}
+	}
+
+	private async Task AddMapLayer(MapLayerViewModel vm)
+	{
+		try
+		{
+			if (mapContainer == null) return;
+
+			overlay = true;
+
+			_= await mapContainer.AddBasicMapLayer(DataService, vm.LayerDef);
+			vm.IsLoaded = true;
+
+			UpdateShowNarrative();
+		}
+		catch (Exception ex)
+		{
+			Logger.LogError(ex, null);
+			ToastService.Error(ex);
+		}
+		finally
+		{
+			overlay = false;
+		}
+	}
+
+	private void UpdateShowNarrative()
+	{
+		if (showNarrativeFirstTime)
+		{
+			showNarrativeFirstTime = false;
+			showNarrative = false;
+		}
+	}
+
+	private async Task OnCheckedChanged(bool value, MapLayerType type)
+	{
+		var vm = mapLayers.First(e => e.LayerDef.LayerType == type);
+
+		if (value)
+		{
+			await AddMapLayer(vm);
+		}
+		else
+		{
+			await mapContainer!.Layers.RemoveLayer(vm.LayerDef);
+			vm.IsLoaded = false;
+		}
+	}
+}

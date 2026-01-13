@@ -7,6 +7,7 @@ using Marqdouj.DotNet.AzureMaps.Map.Layers;
 using Marqdouj.DotNet.AzureMaps.UI.Models.Input;
 using Marqdouj.DotNet.AzureMaps.UI.Models.Maps;
 using Marqdouj.DotNet.Web.Components.Css;
+using System.Collections.Generic;
 
 namespace DemoApp.Shared.Components.Pages.AzureMaps
 {
@@ -27,6 +28,57 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
             }
 
             return inputs;
+        }
+
+        public static async Task<List<MapLayerViewModel>> GetLayerViewModels(IMapDataService dataService)
+        {
+            var mapLayers = new List< MapLayerViewModel>();
+
+            foreach (var layerType in Enum.GetValues<MapLayerType>().Where(e => e != MapLayerType.Unknown))
+            {
+                var layerDef = await layerType.GetDefaultLayerDef(dataService);
+                Position? zoomTo = null;
+                double zoomLevel = 11;
+
+                switch (layerType)
+                {
+                    case MapLayerType.Bubble:
+                        zoomTo = (await dataService.GetBubbleLayerData())[0];
+                        break;
+                    case MapLayerType.HeatMap:
+                        zoomTo = new Position(-122.33, 47.6);
+                        zoomLevel = 1;
+                        break;
+                    case MapLayerType.Image:
+                        zoomTo = new Position(-74.172363, 40.735657);
+                        break;
+                    case MapLayerType.Line:
+                        zoomTo = (await dataService.GetLineLayerData())[0];
+                        zoomLevel = 10;
+                        break;
+                    case MapLayerType.Polygon:
+                        zoomTo = (await dataService.GetPolygonLayerData())[0][0];
+                        break;
+                    case MapLayerType.PolygonExtrusion:
+                        zoomTo = (await dataService.GetPolygonExtLayerData())[0][0];
+                        break;
+                    case MapLayerType.Symbol:
+                        zoomTo = (await dataService.GetSymbolLayerData())[0];
+                        break;
+                    case MapLayerType.Tile:
+                        zoomTo = new Position(-122.426181, 47.608070);
+                        zoomLevel = 10.75;
+                        break;
+                    default:
+                        break;
+                }
+                var data = await dataService.GetBubbleLayerData();
+
+                mapLayers.Add(new MapLayerViewModel(layerDef, zoomTo) { ZoomLevel = zoomLevel });
+                ;
+            }
+
+            return mapLayers;
         }
 
         public static async Task<MapLayerDef> GetDefaultLayerDef(this MapLayerType layerType, IMapDataService dataService)
