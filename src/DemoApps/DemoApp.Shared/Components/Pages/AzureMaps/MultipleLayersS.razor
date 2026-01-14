@@ -75,8 +75,7 @@
 	private IAzureMapContainer? mapContainer;
 	private List<MapLayerViewModel> mapLayers = new();
 	private readonly GeolocationManager geolocationManager = new();
-	private int? watchId;
-	private bool isWatching => watchId != null;
+	private bool isWatching;
 	private bool isNotWatching => !isWatching;
 	private bool disabledWatching => disabled || isWatching;
 	private bool disabledNotWatching => disabled || isNotWatching;
@@ -246,23 +245,36 @@
 			if (watch)
 			{
 				await geolocationManager.Clear(mapContainer);
-				watchId = await mapContainer.Maps.WatchGeolocation();
+				await mapContainer.Maps.WatchGeolocation();
+				isWatching = true;
 				ToastService.Info("Waiting for first Geolocation Watch event...");
 			}
 			else
 			{
-				if (watchId != null)
-				{
-					await mapContainer.Maps.ClearWatchGeolocation(watchId.Value);
-					watchId = null;
-					await geolocationManager.Clear(mapContainer);
-				}
+				await RemoveWatch();
 			}
 		}
 		catch (Exception ex)
 		{
 			Logger.LogError(ex, null);
 			ToastService.Error(ex);
+		}
+	}
+
+	private async Task RemoveWatch()
+	{
+		try
+		{
+			if (mapContainer == null) return;
+			if (isWatching)
+			{
+				await mapContainer.Maps.ClearWatchGeolocation();
+				isWatching = false;
+				await geolocationManager.Clear(mapContainer);
+			}
+		}
+		catch (JSDisconnectedException)
+		{
 		}
 	}
 
