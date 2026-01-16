@@ -13,8 +13,8 @@
   <ItemGroup>
     <PackageReference Include="Marqdouj.DotNet.Aspire.MailKit" Version="10.0.1" />
     <PackageReference Include="Marqdouj.DotNet.General" Version="10.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.12.6" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.12.8" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.0" />
   </ItemGroup>
 

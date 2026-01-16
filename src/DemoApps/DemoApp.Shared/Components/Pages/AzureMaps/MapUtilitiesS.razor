@@ -1,0 +1,132 @@
+﻿@using Marqdouj.DotNet.Web.Components.FluentUI.UIInput
+@inject ILogger<MapUtilitiesS> Logger
+@inject IToastService ToastService
+@inject IDialogService DialogService
+@inject IMapDataService DataService
+
+<PageTitle>Utilities</PageTitle>
+
+<FluentLayout>
+	<MapPageHeader Header="Utilities" LayerDef="null" HRefSource="@hRefSource" @bind-ShowNarrative="@showNarrative">
+		<FluentLabel>
+			<FluentLabel>
+				This page demonstrates some of the map utilities available.
+			</FluentLabel>
+			<br />
+		</FluentLabel>
+	</MapPageHeader>
+
+	<FluentTabs>
+		<FluentTab Label="Mercator Point">
+			<FluentCard AreaRestricted="false">
+				<FluentCard AreaRestricted="false">
+					<FluentButton Disabled="@disabled" IconStart="@(new Icons.Regular.Size20.DesignIdeas())" Title="Do Conversions" OnClick="@GetResults" />
+					<FluentLabel>Position:</FluentLabel>
+					<FluentStack>
+						<FluentNumberField @bind-Value="@position.Longitude" Label="Longitude" />
+						<FluentNumberField @bind-Value="@position.Latitude" Label="Latitude" />
+					</FluentStack>
+				</FluentCard>
+				<FluentCard AreaRestricted="false">
+					<FluentLabel>Results:</FluentLabel>
+					<FluentStack Orientation="Orientation.Vertical">
+						<FluentLabel>@results.FromPosition</FluentLabel>
+						<FluentLabel>@results.ToPosition</FluentLabel>
+						<FluentLabel>@results.MercatorScale</FluentLabel>
+						<FluentLabel>@results.MeterInMercatorUnits</FluentLabel>
+					</FluentStack>
+				</FluentCard>
+			</FluentCard>
+		</FluentTab>
+	</FluentTabs>
+
+
+	<div hidden>
+		<AzureMap OnMapReady="@OnMapReady"
+				  Height="400px"
+				  Width="400px"
+				  Options="@MapHelpers.GetDefaultCreateMapOptions()" />
+	</div>
+</FluentLayout>
+
+<FluentOverlay @bind-Visible="@overlay"
+			   Transparent="false">
+	<FluentProgressRing />
+</FluentOverlay>
+
+@code {
+	private readonly Position position = new Position(-122.33, 47.6); // (Seattle, WA)
+	private ConversionResults results = new();
+	private bool showNarrative = true;
+	private bool showNarrativeFirstTime = true;
+	private string hRefSource => nameof(MapUtilitiesS).ToMapPageSource();
+	private bool overlay;
+	private bool disabled => overlay || mapContainer == null;
+	private IAzureMapContainer? mapContainer;
+
+	private async Task OnMapReady(IAzureMapContainer mapContainer)
+	{
+		try
+		{
+			await Task.CompletedTask;
+			this.mapContainer = mapContainer;
+		}
+		catch (Exception ex)
+		{
+			Logger.LogError(ex, null);
+			ToastService.Error(ex);
+		}
+	}
+
+	private async Task GetResults()
+	{
+		try
+		{
+			if (mapContainer == null) return;
+			overlay = true;
+
+			var data = (Position)position.Clone();
+			var fromPosition = await mapContainer.Maps.Data.Mercator.FromPosition(data);
+			var toPosition = await mapContainer.Maps.Data.Mercator.ToPosition(fromPosition);
+			var mercatorScale = await mapContainer.Maps.Data.Mercator.MercatorScale(data.Latitude);
+			var meterInMercatorUnits = await mapContainer.Maps.Data.Mercator.MeterInMercatorUnits(position.Latitude);
+
+			var conv = new ConversionResults{
+				FromPosition = $"FromPosition: {fromPosition}",
+				ToPosition = $"ToPosition: {toPosition}",
+				MercatorScale = $"MercatorScale: Latitude:{data.Latitude} Scale:{mercatorScale}",
+				MeterInMercatorUnits = $"MeterInMercatorUnits: Latitude:{data.Latitude} Units:{meterInMercatorUnits}"
+			};
+
+			results = conv;
+
+			UpdateShowNarrative();
+		}
+		catch (Exception ex)
+		{
+			Logger.LogError(ex, null);
+			ToastService.Error(ex);
+		}
+		finally
+		{
+			overlay = false;
+		}
+	}
+
+	private void UpdateShowNarrative()
+	{
+		if (showNarrativeFirstTime)
+		{
+			showNarrativeFirstTime = false;
+			showNarrative = false;
+		}
+	}
+
+	private class ConversionResults()
+	{
+		public string? FromPosition { get; set; }
+		public string? ToPosition { get; set; }
+		public string? MercatorScale { get; set; }
+		public string? MeterInMercatorUnits { get; set; }
+	}
+}
