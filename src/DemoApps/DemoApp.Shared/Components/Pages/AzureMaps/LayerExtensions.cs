@@ -7,7 +7,6 @@ using Marqdouj.DotNet.AzureMaps.Map.Layers;
 using Marqdouj.DotNet.AzureMaps.UI.Models.Input;
 using Marqdouj.DotNet.AzureMaps.UI.Models.Maps;
 using Marqdouj.DotNet.Web.Components.Css;
-using System.Collections.Generic;
 
 namespace DemoApp.Shared.Components.Pages.AzureMaps
 {
