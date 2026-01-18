@@ -40,7 +40,7 @@ namespace DemoApp.Shared.Components.Pages.AzureMaps
             return hRef;
         }
 
-        public static string ToMapPageSource(this string name) => HRefRepository.Demo.GitHubSrcItem("DemoApp.Shared", $"Components/Pages/AzureMaps/{name}.razor");
+        public static string ToMapPageSource(this string name, string? subFolder ="") => HRefRepository.Demo.GitHubSrcItem("DemoApp.Shared", $"Components/Pages/AzureMaps/{subFolder}{name}.razor");
         public static string ToMapEventsPageSource(this string name) => HRefRepository.Demo.GitHubSrcItem("DemoApp.Shared", $"Components/Pages/AzureMaps/Events/{name}.razor");
         public static string ToMapCustomSource(this string name) => HRefRepository.Demo.GitHubSrcItem("DemoApp.CustomMaps", name);
 
