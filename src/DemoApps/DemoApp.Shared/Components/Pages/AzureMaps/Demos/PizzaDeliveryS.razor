@@ -225,7 +225,6 @@
         var nextCar = carLocations[currentCar];
         symbolLayerDef.Options!.IconOptions!.Rotation = nextCar.Bearing;
 
-        await mapContainer.Maps.ClearDatasource(symbolLayerDef.DataSource.Id!);
         await mapContainer.Layers.SetOptions(symbolLayerDef);
 
         var geom = (Point)car!.Geometry;
