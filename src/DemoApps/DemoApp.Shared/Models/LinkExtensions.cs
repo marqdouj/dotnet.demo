@@ -23,6 +23,7 @@
         public const string AtlasMinCss = "https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.css";
         public const string AtlasMinJs = "https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.js";
         public const string MarqdoujAzureMapsJs = "_content/Marqdouj.DotNet.AzureMaps/marqdouj-azuremaps.js";
+        public const string AzureMapsAnimationsJs = "_content/DemoApp.Shared/lib/azure-maps/azure-maps-animations.min.js";
 
         public static string Copyright => $"© Douglas Marquardt {DateTime.Today.Year}";
 
