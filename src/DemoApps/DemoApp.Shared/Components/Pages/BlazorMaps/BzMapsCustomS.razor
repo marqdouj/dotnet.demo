@@ -44,8 +44,8 @@
 @code {
     private const string mapId = "customMap";
     private string mapDivStyle => $"height:{mapHeight};width:{mapWidth};border:groove;border-width:1";
-    private readonly string header = "Custom Map (JS Interop)";
-    private string hRefSource => nameof(BzMapCustomS).ToBzMapsPageSource();
+    private readonly string header = "Custom Map";
+    private string hRefSource => nameof(BzMapsCustomS).ToBzMapsPageSource();
     private string hRefCustomMaps => "BzMapsCustom.cs".ToBzMapsCustomSource();
     private string mapHeight = "400px";
     private string mapWidth = "100%";
