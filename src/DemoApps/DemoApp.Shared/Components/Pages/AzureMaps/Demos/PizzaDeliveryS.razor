@@ -1,4 +1,13 @@
-﻿@implements IDisposable
+﻿@using DemoApp.Shared.Models.AzureMaps
+@using Marqdouj.DotNet.AzureMaps
+@using Marqdouj.DotNet.AzureMaps.Map.Animations
+@using Marqdouj.DotNet.AzureMaps.Map.Common
+@using Marqdouj.DotNet.AzureMaps.Map.Configuration
+@using Marqdouj.DotNet.AzureMaps.Map.GeoJson
+@using Marqdouj.DotNet.AzureMaps.Map.Images
+@using Marqdouj.DotNet.AzureMaps.Map.Interop
+@using Marqdouj.DotNet.AzureMaps.Map.Layers
+@implements IDisposable
 @inject ILogger<PizzaDeliveryS> Logger
 @inject IToastService ToastService
 @inject IMapDataService DataService
