@@ -1,0 +1,239 @@
+﻿@using Marqdouj.DotNet.AzureMaps.Blazor.Components
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Events
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.GeoJson
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Geolocation
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Interop
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Layers.Managers
+@inject ILogger<BzMapsGeolocationS> Logger
+@inject IJSRuntime JSRuntime
+@inject IToastService ToastService
+
+<FluentLayout>
+    <BzMapsPageHeader Header="@header" LayerDef="@null" HRefSource="@hRefSource" @bind-ShowNarrative="@showNarrative">
+        <FluentLabel>
+            This example demonstrates using
+        </FluentLabel>
+    </BzMapsPageHeader>
+
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentToolbar>
+            <FluentButton Disabled="@disabledReset" IconStart="@(new Icons.Regular.Size20.ArrowReset())" Title="Reset Map" OnClick="@ResetMap" />
+            <FluentSpacer Width="8" />
+            <FluentButton Disabled="@disabledGetLocation" IconStart="@(new Icons.Regular.Size20.GlobeSearch())" Title="Get Current Location" OnClick="@GetCurrentPosition" />
+            <FluentSpacer Width="3" />
+            <FluentButton Disabled="@disabledWatching" IconStart="@(new Icons.Regular.Size20.EyeTracking())" Title="Start Watch" OnClick="@(() => GeolocationWatch(true))" />
+            <FluentButton Disabled="@disabledNotWatching" IconStart="@(new Icons.Regular.Size20.EyeTrackingOff())" Title="Stop Watch" OnClick="@(() => GeolocationWatch(false))" />
+        </FluentToolbar>
+
+        <MapsContainer OnManagerReady="@ManagerReady"
+                       OnMapEventReady="@MapEventReady"
+                       OnMapEventError="@MapEventError"
+                       OnGeolocationWatch="@OnGeolocationWatch">
+            <div id="@mapId" style="@mapDivStyle">
+            </div>
+        </MapsContainer>
+    </FluentStack>
+</FluentLayout>
+
+<FluentOverlay @bind-Visible="@overlay"
+               Transparent="false">
+    <FluentProgressRing />
+</FluentOverlay>
+
+@code {
+    private const string mapId = "mapGeoloctions";
+    private string mapDivStyle => $"height:{mapHeight};width:{mapWidth};border:groove;border-width:1";
+    private readonly string header = "Geolocation";
+    private string hRefSource => nameof(BzMapsGeolocationS).ToBzMapsPageSource();
+    private string mapHeight = "400px";
+    private string mapWidth = "100%";
+    private bool showNarrative = true;
+    private IAzMapsManager? mapsManager;
+    private IAzMapInterop? mapInterop;
+    private bool mapAReady => mapInterop is not null;
+    private bool overlay;
+    private bool disabled => overlay || mapsManager == null;
+    private bool disabledReset => disabled || isWatching;
+    private readonly GeolocationLayers geolocationLayers = new();
+    private bool isWatching;
+    private bool isNotWatching => !isWatching;
+    private bool disabledWatching => disabled || isWatching;
+    private bool disabledNotWatching => disabled || isNotWatching;
+    private bool disabledGetLocation => disabled || isWatching;
+
+    private async Task ManagerReady(MapsManagerEventArgs args)
+    {
+        try
+        {
+            if (args.Success)
+                this.mapsManager = args.Manager;
+            else
+            {
+                ToastService.ShowError(args.ExceptionMessage);
+                return;
+            }
+
+            var options = MapHelpers.GetDefaultCreateMapOptions();
+            var controls = MapHelpers.GetDefaultControls();
+            await mapsManager!.CreateMap(mapId, options: options, controls: controls, logLevel: LogLevel.Trace);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    #region JsInterop
+
+    private async Task MapEventError(MapEventArgs args)
+    {
+        ToastService.ShowError($"Map Error! {args.Payload?.Error?.Message}");
+    }
+
+    private async Task MapEventReady(MapEventArgs args)
+    {
+        try
+        {
+            mapInterop = mapsManager!.GetInterop(mapId);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task OnGeolocationWatch(GeolocationEventArgs e)
+    {
+        ToastService.ShowInfo($"Geolocation Watch event received. Success:{e.IsSuccess}");
+
+        if (e.IsSuccess)
+            await UpdateGeolocation(e.Result!);
+    }
+
+    #endregion
+
+    private async Task ResetMap()
+    {
+        try
+        {
+            if (mapInterop is null) return;
+
+            if (isWatching)
+                await RemoveWatch();
+
+            await geolocationLayers.RemoveLayers(mapInterop);
+
+            await mapInterop.Configurations.SetMapOptions(MapHelpers.GetDefaultSetMapOptions());
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    #region Geolocaion Manager
+
+    private async Task GetCurrentPosition()
+    {
+        try
+        {
+            if (mapInterop is null) return;
+
+            overlay = true;
+
+            var geolocation = await mapInterop.Geolocations.GetLocation(new PositionOptions { EnableHighAccuracy = true });
+
+            if (geolocation != null)
+            {
+                if (geolocation.IsSuccess)
+                {
+                    await UpdateGeolocation(geolocation);
+                }
+                else
+                {
+                    var errMsg = $"Geolocation service failed. {geolocation.Error?.Message}";
+                    Logger?.LogError(errMsg);
+                    ToastService.ShowError(errMsg);
+                }
+            }
+            else
+            {
+                var warnMsg = $"Geolocation service returned null.";
+                Logger?.LogWarning(warnMsg);
+                ToastService.ShowWarning(warnMsg);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+        finally
+        {
+            overlay = false;
+        }
+    }
+
+
+    private async Task GeolocationWatch(bool watch)
+    {
+        try
+        {
+            if (mapInterop is null) return;
+            if (watch && isWatching) return;
+            if (!watch && isNotWatching) return;
+
+            if (watch)
+            {
+                await geolocationLayers.Clear(mapInterop);
+                await mapInterop.Geolocations.WatchPosition();
+                isWatching = true;
+                ToastService.ShowInfo("Waiting for first Geolocation Watch event...");
+            }
+            else
+            {
+                await RemoveWatch();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task RemoveWatch()
+    {
+        try
+        {
+            if (mapInterop is null) return;
+            if (isWatching)
+            {
+                await mapInterop.Geolocations.ClearWatch();
+                isWatching = false;
+                await geolocationLayers.Clear(mapInterop);
+            }
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    }
+
+    private async Task UpdateGeolocation(GeolocationResult geolocation)
+    {
+        if (mapInterop == null) return;
+
+        var coordinates = geolocation.Position!.Coords!;
+        var position = new Position(coordinates.Longitude, coordinates.Latitude) { Accuracy = geolocation.Position.Coords?.Accuracy };
+        if (!geolocationLayers.LayersAdded)
+            await geolocationLayers.AddLayers(mapInterop);
+        await geolocationLayers.Clear(mapInterop);
+        await geolocationLayers.AddPosition(mapInterop, position);
+        await mapInterop.Configurations.ZoomTo(position, 15);
+    }
+
+    #endregion
+}
