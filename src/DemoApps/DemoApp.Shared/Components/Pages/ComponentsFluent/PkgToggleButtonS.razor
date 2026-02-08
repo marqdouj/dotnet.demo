@@ -1,0 +1,45 @@
+﻿@using Marqdouj.DotNet.Web.Components.FluentUI.Buttons
+<PageTitle>Components (Fluent) - Toggle Button</PageTitle>
+
+<FluentLayout>
+    <PkgPageHeader Header="@subject"
+                   HRefCode="@hRefCode"
+                   Subject="@subject">
+        <FluentLabel>
+            A button that manages a True/False state with corresonding Icons.
+        </FluentLabel>
+    </PkgPageHeader>
+
+    <FluentToolbar>
+        <ToggleButton @bind-ToggleState="@stateA" Title="@stateATitle" />
+        <ToggleButton ToggleStateChanged="@ToggleStateBChanged"
+                      Title="@stateBTitle"
+                      IconFalse="@(new Icons.Regular.Size20.ToggleLeft())"
+                      IconTrue="@(new Icons.Regular.Size20.ToggleRight())" />
+    </FluentToolbar>
+
+    <FluentStack>
+        <FluentLabel Typo="Typography.Subject">Toggle State A:</FluentLabel>
+        <FluentLabel>@stateA</FluentLabel>
+    </FluentStack>
+
+    <FluentStack>
+        <FluentLabel Typo="Typography.Subject">Toggle State B:</FluentLabel>
+        <FluentLabel>@stateB</FluentLabel>
+    </FluentStack>
+</FluentLayout>
+
+@code {
+    private readonly string hRefCode = HRefRepository.ComponentsFluentUI.GitHubSrcItem(null, "Buttons/ToggleButton.razor");
+    private readonly string subject = "Toggle Button";
+    private bool stateA;
+    private string stateATitle => stateA ? "Alert On" : "Alert Off";
+    private bool stateB;
+    private string stateBTitle => stateB ? "Switch Left" : "Switch Right";
+
+    private void ToggleStateBChanged(bool toggleState)
+    {
+        stateB = toggleState;
+    }
+}
+
