@@ -24,6 +24,33 @@
     <ReconnectModal />
     <script src="_framework/blazor.web.js"></script>
 
+    @* Add the script for Marqdouj.DotNet.AzureMaps.Blazor *@
+    <script src="@LinkExtensions.MarqdoujAzureMapsBlazorJs"></script>
+
+    @* Add the script required for SasToken (if applicable) *@
+    @*     <script type="text/javascript">
+        marqdoujAzureMapsBlazor.Factory.getAuthTokenCallback = (resolve, reject, map) => {
+            DotNet.invokeMethodAsync('DemoApp.Shared', 'GetSasToken')
+            .then(function (response) {
+                return response;
+            }).then(function (token) {
+                resolve(token);
+            });
+        };
+    </script> *@
+
+    @* Add the script required for Anonymous authentication (if applicable) *@
+    @* <script type="text/javascript">
+        marqdoujAzureMapsBlazor.Factory.getAuthTokenCallback = (resolve, reject, map) => {
+            DotNet.invokeMethodAsync('DemoApp.Shared', 'GetAccessToken')
+            .then(function (response) {
+                return response;
+            }).then(function (token) {
+                resolve(token);
+            });
+        };
+    </script> *@
+
     @* Add the script for Marqdouj.DotNet.AzureMaps *@
     <script src="@LinkExtensions.MarqdoujAzureMapsJs"></script>
 

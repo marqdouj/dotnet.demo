@@ -1,0 +1,169 @@
+﻿@using DemoApp.Shared.Models.BlazorMaps
+@using Marqdouj.DotNet.AzureMaps.Blazor.Components
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Events
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Interop
+@implements IAsyncDisposable
+@inject IJSRuntime JSRuntime
+@inject ILogger<BzMapsCustom> Logger
+@inject IToastService ToastService
+
+<FluentLayout>
+    <BzMapsPageHeader Header="@header" LayerDef="@null" HRefSource="@hRefSource" @bind-ShowNarrative="@showNarrative">
+        <FluentLabel>
+            This example demonstrates using 
+            <a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/javascript-interoperability" target="_blank">JS Interop</a>
+            to work with a map created using the
+            <a href="https://www.nuget.org/packages/Marqdouj.DotNet.AzureMaps.Blazor" target="_blank">Marqdouj.DotNet.AzureMaps.Blazor</a>
+            NuGet package.
+            <br /><br />
+            JS Interop
+            <a href="@hRefCustomMaps" target="_blank">Source Code</a>
+            <br /><br />
+            The toolbar buttons allow you to 'reset the map' , 'check for map access', 'add controls', or 'remove controls'.
+        </FluentLabel>
+    </BzMapsPageHeader>
+
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentToolbar>
+            <FluentButton Disabled="@disabledMap" IconStart="@(new Icons.Regular.Size20.ArrowReset())" Title="Reset Map" OnClick="@ResetMap" />
+            <FluentSpacer Width="8" />
+            <FluentButton Disabled="@disabledMap" IconStart="@(new Icons.Regular.Size20.Map())" Title="Check for map access using JS Interop" OnClick="@CheckForMap" />
+            <FluentButton Disabled="@disabledMap" IconStart="@(new Icons.Regular.Size20.DesignIdeas())" Title="Add Controls" OnClick="@AddControls" />
+            <FluentButton Disabled="@disabledMap" IconStart="@(new Icons.Regular.Size20.ClearFormatting())" Title="Remove Controls" OnClick="@RemoveControls" />
+        </FluentToolbar>
+
+        <MapsContainer OnManagerReady="@ManagerReady"
+                       OnMapEventReady="@MapEventReady"
+                       OnMapEventError="@MapEventError">
+            <div id="@mapId" style="@mapDivStyle">
+            </div>
+        </MapsContainer>
+    </FluentStack>
+</FluentLayout>
+
+@code {
+    private const string mapId = "customMap";
+    private string mapDivStyle => $"height:{mapHeight};width:{mapWidth};border:groove;border-width:1";
+    private readonly string header = "Custom Map (JS Interop)";
+    private string hRefSource => nameof(BzMapCustomS).ToBzMapsPageSource();
+    private string hRefCustomMaps => "BzMapsCustom.cs".ToBzMapsCustomSource();
+    private string mapHeight = "400px";
+    private string mapWidth = "100%";
+    private bool showNarrative = true;
+    private bool disabled => mapsManager == null;
+    private bool disabledMap => disabled || !mapReady;
+    private bool mapReady => mapInterop is not null;
+    private BzMapsCustom? customMaps;
+    private IAzMapsManager? mapsManager;
+    private IAzMapInterop? mapInterop;
+
+    protected override void OnInitialized()
+    {
+        customMaps = new(JSRuntime);
+    }
+
+    private async Task ManagerReady(MapsManagerEventArgs args)
+    {
+        try
+        {
+            if (args.Success)
+                this.mapsManager = args.Manager;
+            else
+            {
+                ToastService.ShowError(args.ExceptionMessage);
+                return;
+            }
+
+            var options = MapHelpers.GetDefaultCreateMapOptions();
+            await mapsManager!.CreateMap(mapId, options: options, logLevel: LogLevel.Trace);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task MapEventError(MapEventArgs args)
+    {
+        ToastService.ShowError(args.Payload!.Error!.ToString());
+    }
+
+    private async Task MapEventReady(MapEventArgs args)
+    {
+        try
+        {
+            mapInterop = mapsManager!.GetInterop(mapId);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task ResetMap()
+    {
+        try
+        {
+            if (mapInterop == null) return;
+            await mapInterop.Configurations.SetMapOptions(MapHelpers.GetDefaultSetMapOptions());
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task CheckForMap()
+    {
+        try
+        {
+            var exists = await customMaps!.MapExists(mapId);
+            ToastService.ShowInfo($"Check for map access: {exists}");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task AddControls()
+    {
+        try
+        {
+            var msg = await customMaps!.AddControls(mapId);
+            ToastService.ShowInfo(msg);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task RemoveControls()
+    {
+        try
+        {
+            var msg = await customMaps!.RemoveControls(mapId);
+            ToastService.ShowInfo(msg);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (customMaps != null)
+        {
+            await customMaps.DisposeAsync();
+            customMaps = null;
+        }
+    }
+}

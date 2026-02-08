@@ -1,5 +1,7 @@
-﻿using Marqdouj.DotNet.AzureMaps.UI.Services;
-using DemoApp.Shared.Models.AzureMaps;
+﻿using DemoApp.Shared.Models.AzureMaps;
+using DemoApp.Shared.Models.BlazorMaps;
+using Marqdouj.DotNet.AzureMaps.Blazor.UI.Services;
+using Marqdouj.DotNet.AzureMaps.UI.Services;
 using Marqdouj.DotNet.Web.Components.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -42,6 +44,12 @@ namespace DemoApp.Shared
             builder.Services.AddMapConfiguration(builder.Configuration);
             builder.Services.AddScoped<IAzureMapsXmlService, AzureMapsXmlService>(); //Only for demo purposes; not required in production.
             builder.Services.AddScoped<IMapDataService, MapDataService>(); //Only for demo purposes; simulates getting map data from an API.
+            #endregion
+
+            #region Marqdouj.DotNet.AzureMaps.Blazor
+            builder.Services.ConfigureMarqdoujAzMapsBlazor(builder.Configuration);
+            builder.Services.AddScoped<IAzureMapsUIXmlService, AzureMapsUIXmlService>(); //Only for demo purposes; not required in production.
+            builder.Services.AddScoped<IBzMapsDataService, BzMapsDataService>(); //Only for demo purposes; simulates getting map data from an API.
             #endregion
 
             return builder;

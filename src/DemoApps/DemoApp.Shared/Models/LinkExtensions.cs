@@ -3,7 +3,8 @@
     public enum HRefRepository
     {
         AzureMaps,
-        AzureMapsUI, 
+        AzureMapsUI,
+        AzureMapsBlazor,
         Components,
         ComponentsFluentUI,
         Demo,
@@ -23,6 +24,7 @@
         public const string AtlasMinCss = "https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.css";
         public const string AtlasMinJs = "https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.js";
         public const string MarqdoujAzureMapsJs = "_content/Marqdouj.DotNet.AzureMaps/marqdouj-azuremaps.js";
+        public const string MarqdoujAzureMapsBlazorJs = "_content/Marqdouj.DotNet.AzureMaps.Blazor/marqdouj-azuremaps-blazor.js";
         public const string AzureMapsAnimationsJs = "_content/DemoApp.Shared/lib/azure-maps/azure-maps-animations.min.js";
 
         public static string Copyright => $"© Douglas Marquardt {DateTime.Today.Year}";
@@ -76,6 +78,7 @@
             {
                 HRefRepository.AzureMaps => $"{prefix}DotNet.AzureMaps",
                 HRefRepository.AzureMapsUI => $"{prefix}DotNet.AzureMaps.UI",
+                HRefRepository.AzureMapsBlazor => $"{prefix}DotNet.AzureMaps.Blazor",
                 HRefRepository.Components => $"{prefix}DotNet.Web.Components",
                 HRefRepository.ComponentsFluentUI => $"{prefix}DotNet.Web.Components.FluentUI",
                 HRefRepository.Demo => $"{prefix}DotNet.Demo",

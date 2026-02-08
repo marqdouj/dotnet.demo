@@ -1,0 +1,12 @@
+﻿<PageTitle>Azure Maps (Blazor)</PageTitle>
+
+<FluentLayout>
+	<FluentHeader>@HRefRepository.AzureMapsBlazor.Name()</FluentHeader>
+
+	<ReadMeView Repository="HRefRepository.AzureMapsBlazor" Height="@height" />
+</FluentLayout>
+
+@code {
+	private string header => $"{HRefRepository.AzureMapsBlazor.Name()}";
+	private string height = "600px";
+}
