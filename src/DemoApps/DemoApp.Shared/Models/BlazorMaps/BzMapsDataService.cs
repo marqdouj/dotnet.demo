@@ -145,7 +145,7 @@ namespace DemoApp.Shared.Models.BlazorMaps
 
     public class ImageLayerData()
     {
-        public string Url { get; } = "newark_nj_1922.jpg";
+        public string Url { get; } = "_content/DemoApp.Shared/newark_nj_1922.jpg";
 
         public ImageCoordinates Coordinates { get; set; } =
             [

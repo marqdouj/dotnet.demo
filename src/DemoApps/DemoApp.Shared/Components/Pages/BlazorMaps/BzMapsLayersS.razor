@@ -1,0 +1,273 @@
+﻿@using DemoApp.Shared.Models.BlazorMaps
+@using Marqdouj.DotNet.AzureMaps.Blazor.Components
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Configuration
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Events
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Interop
+@using Marqdouj.DotNet.AzureMaps.Blazor.UI.Models
+@using Marqdouj.DotNet.AzureMaps.Blazor.UI.Models.Input
+@using Marqdouj.DotNet.AzureMaps.Blazor.UI.Models.Layers
+@using Marqdouj.DotNet.AzureMaps.Blazor.UI.Services
+@inject ILogger<BzMapsLayersS> Logger
+@inject IJSRuntime JSRuntime
+@inject IToastService ToastService
+@inject IDialogService DialogService
+@inject IBzMapsDataService DataService
+@inject IAzureMapsUIXmlService XmlService
+
+<FluentLayout>
+    <BzMapsPageHeader Header="@header" LayerDef="@null" @bind-ShowNarrative="@showNarrative">
+        <FluentLabel>
+            <FluentLabel>
+                This example demonstrates each type of basic map layer this library supports. 
+                <br />
+                It also demonstrates using the optional
+                <a href="https://www.nuget.org/packages/Marqdouj.DotNet.AzureMaps.Blazor.UI" target="_blank">UI Companion library</a>.
+            </FluentLabel>
+            <br />
+            <FluentCheckbox @bind-Value="@useUI">Use UI Companion Library</FluentCheckbox>
+        </FluentLabel>
+    </BzMapsPageHeader>
+
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentToolbar>
+            <FluentButton Disabled="@disabled" IconStart="@(new Icons.Regular.Size20.ArrowReset())" Title="Reset Map" OnClick="@ResetMap" />
+            <FluentSpacer Width="8" />
+        </FluentToolbar>
+
+        <FluentStack>
+            <FluentCard Height="@mapHeight" Width="300px" Style="overflow:auto">
+                <div>
+                    <FluentStack Orientation="Orientation.Vertical">
+                        @foreach (var vm in layers)
+                        {
+                            <FluentStack VerticalAlignment="VerticalAlignment.Center">
+                                <FluentCheckbox Disabled="@disabledMap" @bind-Value:get="@vm.IsLoaded" @bind-Value:set="@((e) => OnMapLayerCheckedChanged(e, vm))">@vm.DisplayName</FluentCheckbox>
+                                @if (useUI)
+                                {
+                                    <FluentButton Disabled="@vm.IsNotLoaded" IconStart="@(new Icons.Regular.Size20.Settings())" Title="Set Options" OnClick="@(() => SetLayerOptions(vm))" />
+                                }
+                                @if (vm.ZoomTo != null)
+                                {
+                                    <FluentButton Disabled="@vm.IsNotLoaded" IconStart="@(new Icons.Regular.Size20.ZoomIn())" Title="Zoom To" OnClick="@(() => ZoomToLayer(vm))" />
+                                }
+                            </FluentStack>
+                        }
+                    </FluentStack>
+                </div>
+            </FluentCard>
+
+            <MapsContainer OnManagerReady="@ManagerReady"
+                           OnMapEventReady="@MapEventReady"
+                           OnMapEventError="@MapEventError">
+                <div id="@mapId" style="@mapDivStyle">
+                </div>
+            </MapsContainer>
+        </FluentStack>
+    </FluentStack>
+</FluentLayout>
+
+<FluentOverlay @bind-Visible="@overlay"
+               Transparent="false">
+    <FluentProgressRing />
+</FluentOverlay>
+
+@code {
+    private const string mapId = "mapLayers";
+    private const string header = "Layers";
+    private string mapHeight = "400px";
+    private string mapWidth = "100%";
+    private string mapDivStyle => $"height:{mapHeight};width:{mapWidth};border:groove;border-width:1";
+    private bool mapReady => mapInterop is not null;
+    private bool overlay;
+    private bool disabled => overlay || mapsManager == null;
+    private bool disabledMap => disabled || !mapReady;
+    private string hRefSource => nameof(BzMapsLayersS).ToBzMapsPageSource();
+    private MapOptionsSet resetOptions = MapHelpers.GetDefaultSetMapOptions();
+    private readonly List<LayerDefViewModel> layers = [];
+    private bool useUI = true;
+    private bool showNarrative = true;
+    private bool showNarrativeFirstTime = true;
+    private IAzMapsManager? mapsManager;
+    private IAzMapInterop? mapInterop;
+
+    protected override async Task OnInitializedAsync()
+    {
+        layers.AddRange(await MapHelpers.GetLayerViewModels(DataService));
+    }
+
+    private async Task ResetMap()
+    {
+        try
+        {
+            if (mapInterop == null) return;
+
+            var loaded = layers.Where(e => e.IsLoaded).ToList();
+
+            if (loaded.Any())
+            {
+                await mapInterop.Layers.Remove(loaded.Select(e => e.LayerDef));
+                foreach (var layer in loaded)
+                {
+                    layer.IsLoaded = false;
+                }
+            }
+
+            await mapInterop.Configurations.SetMapOptions(resetOptions);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task ManagerReady(MapsManagerEventArgs args)
+    {
+        try
+        {
+            if (args.Success)
+                this.mapsManager = args.Manager;
+            else
+            {
+                ToastService.ShowError(args.ExceptionMessage);
+                return;
+            }
+
+            var options = MapHelpers.GetDefaultCreateMapOptions();
+            var controls = MapHelpers.GetDefaultControls();
+            await mapsManager!.CreateMap(mapId, options: options, controls: controls, logLevel: LogLevel.Trace);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+    private async Task MapEventError(MapEventArgs args)
+    {
+        ToastService.ShowError(args.Payload!.Error!.ToString());
+    }
+
+    private async Task MapEventReady(MapEventArgs args)
+    {
+        try
+        {
+            mapInterop = mapsManager!.GetInterop(mapId);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task OnMapLayerCheckedChanged(bool value, LayerDefViewModel model)
+    {
+        try
+        {
+            if (mapInterop is null) return;
+            if (model.IsLoaded == value) return;
+
+            if (value)
+            {
+                if (useUI)
+                {
+                    var uiLayerDef = model.LayerDef.GetClone();
+                    var uiModel = uiLayerDef.GetLayerDefUIModel(XmlService);
+                    var input = new InputLayersDialogParameters(uiModel, UIModelResetCategory.Full);
+                    var result = await DialogService.ShowLayerInputsDialog($"{model.LayerDef.LayerType} Layer Settings", input);
+
+                    if (result.Cancelled)
+                        return;
+
+                    overlay = true;
+                    model.LayerDef = await uiModel.LayerDef.AddBasicMapLayer(mapInterop, DataService);
+                }
+                else
+                {
+                    overlay = true;
+
+                    await model.LayerDef.AddBasicMapLayer(mapInterop, DataService);
+                }
+
+                UpdateShowNarrative();
+            }
+            else
+            {
+                await mapInterop.Layers.Remove(model.LayerDef);
+            }
+
+            model.IsLoaded = value;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+        finally
+        {
+            overlay = false;
+        }
+    }
+
+    private void UpdateShowNarrative()
+    {
+        if (showNarrativeFirstTime)
+        {
+            showNarrativeFirstTime = false;
+            showNarrative = false;
+        }
+    }
+
+    private async Task ZoomToLayer(LayerDefViewModel vm)
+    {
+        try
+        {
+            if (mapInterop is null) return;
+            if (!vm.IsLoaded) return;
+
+            overlay = true;
+            await mapInterop.Configurations.ZoomTo(vm.ZoomTo!, vm.ZoomLevel);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+        finally
+        {
+            overlay = false;
+        }
+    }
+
+    private async Task SetLayerOptions(LayerDefViewModel vm)
+    {
+        try
+        {
+            if (mapInterop is null) return;
+            if (!vm.IsLoaded) return;
+
+            var uiLayerDef = vm.LayerDef.GetClone();
+            var uiModel = uiLayerDef.GetLayerDefUIModel(XmlService);
+            var options = uiModel.UIModelOptions;
+            var input = new InputDialogParameters(uiModel, options.ToUIInputList(), UIModelResetCategory.Options);
+            var result = await DialogService.ShowInputsDialog($"{vm.LayerDef.LayerType} Layer Options", input);
+
+            if (result.Cancelled)
+                return;
+
+            overlay = true;
+            await mapInterop.Layers.SetOptions(uiLayerDef);
+            vm.LayerDef.SetOptions(options.GetSource());
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+        finally
+        {
+            overlay = false;
+        }
+    }
+}
