@@ -1,0 +1,192 @@
+﻿@using Marqdouj.DotNet.AzureMaps.Blazor.Components
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Configuration
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Events
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Interop
+@inject ILogger<BzMapsMultipleS> Logger
+@inject IJSRuntime JSRuntime
+@inject IToastService ToastService
+
+<FluentLayout>
+    <BzMapsPageHeader Header="@header" LayerDef="@null" @bind-ShowNarrative="@showNarrative">
+        <FluentLabel>
+            <FluentLabel>
+                This example demonstrates adding more than one Azure Map component to a page.
+                <br />
+                Two maps are created that are independent of each other and
+                contain their own distinct configurations.
+            </FluentLabel>
+            <br />
+        </FluentLabel>
+    </BzMapsPageHeader>
+
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentToolbar>
+            <FluentButton Disabled="@disabledA" IconStart="@(new Icons.Regular.Size20.DesignIdeas())" Title="Map Ready Check MapA" OnClick="@(() => MapReadyCheck(mapA))" />
+            <FluentButton Disabled="@disabledB" IconStart="@(new Icons.Regular.Size20.DesignIdeas())" Title="Map Ready Check MapB" OnClick="@(() => MapReadyCheck(mapB))" />
+            <FluentSpacer Width="8" />
+        </FluentToolbar>
+
+        <MapsContainer OnManagerReady="@ManagerReady"
+                       OnMapEventReady="@MapEventReady"
+                       OnMapEventError="@MapEventError"
+                       OnMapEvent="@MapEvent">
+            <FluentGrid>
+                <FluentGridItem>
+                    <FluentCard AreaRestricted="false" MinimalStyle="true" Width="@cardWidth">
+                        <FluentToolbar>
+                            <FluentButton Disabled="@disabled" IconStart="@(new Icons.Regular.Size20.ArrowReset())" Title="Reset Map" OnClick="@(() => ResetMap(mapA))" />
+                            <FluentSpacer Width="8" />
+                            <FluentButton Disabled="@disabledA" IconStart="@(new Icons.Regular.Size20.DesignIdeas())" Title="Map Ready Check" OnClick="@(() => MapReadyCheck(mapA))" />
+                        </FluentToolbar>
+                        <div id="@mapA" style="@divStyle">
+                        </div>
+                    </FluentCard>
+                </FluentGridItem>
+
+                <FluentGridItem>
+                    <FluentCard AreaRestricted="false" MinimalStyle="true" Width="@cardWidth">
+                        <FluentToolbar>
+                            <FluentButton Disabled="@disabled" IconStart="@(new Icons.Regular.Size20.ArrowReset())" Title="Reset Map" OnClick="@(() => ResetMap(mapB))" />
+                            <FluentSpacer Width="8" />
+                            <FluentButton Disabled="@disabledB" IconStart="@(new Icons.Regular.Size20.DesignIdeas())" Title="Map Ready Check" OnClick="@(() => MapReadyCheck(mapB))" />
+                        </FluentToolbar>
+                        <div id="@mapB" style="@divStyle">
+                        </div>
+                    </FluentCard>
+                </FluentGridItem>
+            </FluentGrid>
+        </MapsContainer>
+    </FluentStack>
+</FluentLayout>
+
+<FluentOverlay @bind-Visible="@overlay"
+               Transparent="false">
+    <FluentProgressRing />
+</FluentOverlay>
+
+@code {
+    private const string header = "Multiple";
+    private const string mapA = "mapA";
+    private const string mapB = "mapB";
+    private string divStyle => "height:400px;width:100%;border:groove;border-width:1";
+    private string cardWidth => "400px";
+    private IAzMapsManager? mapsManager;
+    private IAzMapInterop? mapInteropA;
+    private IAzMapInterop? mapInteropB;
+    private bool showNarrative = true;
+    private bool mapAReady => mapInteropA is not null;
+    private bool mapBReady => mapInteropB is not null;
+    private bool overlay;
+    private bool disabled => overlay || mapsManager == null;
+    private bool disabledA => disabled || !mapAReady;
+    private bool disabledB => disabled || !mapBReady;
+    private readonly MapOptionsSet resetOptionsA = MapHelpers.GetDefaultSetMapOptions();
+    private readonly MapOptionsSet resetOptionsB = MapHelpers.GetDefaultSetMapOptions();
+
+    private async Task MapReadyCheck(string mapId)
+    {
+        IAzMapInterop? mapInterop = null;
+
+        switch (mapId)
+        {
+            case mapA:
+                mapInterop = mapInteropA;
+                break;
+            case mapB:
+                mapInterop = mapInteropB;
+                break;
+        }
+
+        if (mapInterop != null)
+        {
+            ToastService.ShowInfo($"{mapInterop.MapId} is ready for interaction.");
+        }
+        else
+        {
+            ToastService.ShowError($"{mapId} is NOT ready for interaction!");
+        }
+    }
+
+    private async Task ManagerReady(MapsManagerEventArgs args)
+    {
+        try
+        {
+            if (args.Success)
+                this.mapsManager = args.Manager;
+            else
+            {
+                ToastService.ShowError(args.ExceptionMessage);
+                return;
+            }
+
+            var options = MapHelpers.GetDefaultCreateMapOptions();
+            var controls = MapHelpers.GetDefaultControls();
+
+            await mapsManager!.CreateMap(mapA, options: options, controls: controls, logLevel: LogLevel.Trace);
+
+            resetOptionsB.Style!.Style = MapStyle.Satellite_Road_Labels;
+            options.Style!.Style = MapStyle.Satellite_Road_Labels;
+            await mapsManager.CreateMap(mapB, options: options, controls: controls, logLevel: LogLevel.Trace);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    #region JsInterop
+
+    private async Task MapEvent(MapEventArgs args)
+    {
+        Console.WriteLine(args.ToJsonMin());
+    }
+
+    private async Task MapEventError(MapEventArgs args)
+    {
+        ToastService.ShowError(args.ToJsonMin());
+    }
+
+    private async Task MapEventReady(MapEventArgs args)
+    {
+        ToastService.ShowInfo($"{args.MapId} is ready!");
+
+        try
+        {
+            switch (args.MapId)
+            {
+                case mapA:
+                    mapInteropA = mapsManager!.GetInterop(mapA);
+                    break;
+                case mapB:
+                    mapInteropB = mapsManager!.GetInterop(mapB);
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    #endregion
+
+    private async Task ResetMap(string mapId)
+    {
+        try
+        {
+            var isReady = mapId == mapA ? mapAReady : mapBReady;
+            if (!isReady) return;
+
+            var interop = mapId == mapA ? mapInteropA : mapInteropB;
+            var options = mapId == mapA ? resetOptionsA : resetOptionsB;
+            await interop!.Configurations.SetMapOptions(options);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+}
