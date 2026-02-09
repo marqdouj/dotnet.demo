@@ -14,8 +14,8 @@
   <ItemGroup>
     <PackageReference Include="Markdig" Version="0.44.0" />
     <PackageReference Include="Marqdouj.DotNet.AzureMaps" Version="10.8.0" />
-    <PackageReference Include="Marqdouj.DotNet.AzureMaps.Blazor" Version="10.0.0-Preview-1.0" />
-    <PackageReference Include="Marqdouj.DotNet.AzureMaps.Blazor.UI" Version="10.0.0-Preview-1.0" />
+    <PackageReference Include="Marqdouj.DotNet.AzureMaps.Blazor" Version="10.0.0" />
+    <PackageReference Include="Marqdouj.DotNet.AzureMaps.Blazor.UI" Version="10.0.0" />
     <PackageReference Include="Marqdouj.DotNet.AzureMaps.UI" Version="10.8.0" />
     <PackageReference Include="Marqdouj.DotNet.Web.Components.FluentUI" Version="10.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.2" />

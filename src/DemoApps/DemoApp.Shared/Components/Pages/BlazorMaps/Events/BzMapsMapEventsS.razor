@@ -1,0 +1,230 @@
+﻿@using DemoApp.Shared.Models.BlazorMaps
+@using Marqdouj.DotNet.AzureMaps.Blazor.Components
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Events
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Interop
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Layers
+@inject ILogger<BzMapsMapEventsS> Logger
+@inject IJSRuntime JSRuntime
+@inject IToastService ToastService
+@inject IBzMapsDataService DataService
+
+<FluentLayout>
+    <BzMapsPageHeader Header="@header" LayerDef="@null" HRefSource="@hRefSource" @bind-ShowNarrative="@showNarrative">
+        <FluentLabel>
+            This example demonstrates dynamically adding/removing map events.
+        </FluentLabel>
+    </BzMapsPageHeader>
+
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentToolbar>
+            <FluentButton Disabled="@disabled" IconStart="@(new Icons.Regular.Size20.ArrowReset())" Title="Reset Map" OnClick="@ResetMap" />
+            <FluentSpacer Width="8" />
+            <FluentButton Disabled="@disabledA" OnClick="@AddRemoveLayer">
+                <FluentIcon Value="@layerIcon" Slot="start" />
+                @layerLabel
+            </FluentButton>
+        </FluentToolbar>
+
+        <FluentStack>
+            <FluentCard Height="@mapHeight" Width="250px" Style="overflow:auto">
+                <div>
+                    <FluentStack Orientation="Orientation.Vertical">
+                        @foreach (var item in mapEvents)
+                        {
+                            <FluentCheckbox Disabled="@disabledA" @bind-Value:get="@item.IsLoaded" @bind-Value:set="@((e) => OnMapEventsCheckedChanged(e, item.Type))">@item.Name</FluentCheckbox>
+                        }
+                    </FluentStack>
+                </div>
+            </FluentCard>
+
+            <MapsContainer OnManagerReady="@ManagerReady"
+                           OnMapEventReady="@MapEventReady"
+                           OnMapEventError="@MapEventError"
+                           OnMapEvent="@MapEvent">
+                <div id="@mapA" style="@mapDivStyle">
+                </div>
+            </MapsContainer>
+        </FluentStack>
+
+        <BzMapsEventViewer Events="@eventArgsManager" Mulitline="true" />
+    </FluentStack>
+</FluentLayout>
+
+<FluentOverlay @bind-Visible="@overlay"
+               Transparent="false">
+    <FluentProgressRing />
+</FluentOverlay>
+
+@code {
+    private const string header = "Map Events";
+    private const string mapA = "mapA";
+    private const string mapHeight = "350px";
+    private string mapDivStyle => "height:350px;width:100%;border:groove;border-width:1";
+    private string hRefSource => nameof(BzMapsMapEventsS).ToBzMapsPageSource("Events/");
+    private IAzMapsManager? mapsManager;
+    private IAzMapInterop? mapInteropA;
+    private readonly List<MapEventViewModel> mapEvents = MapEventTarget.Map.GetMapEventDefs().Select(e => new MapEventViewModel(e)).ToList();
+    private bool mapAReady => mapInteropA is not null;
+    private bool overlay;
+    private bool disabled => overlay || mapsManager == null;
+    private bool disabledA => disabled || !mapAReady;
+    private bool showNarrative = true;
+    private readonly MapEventArgsViewModelManager eventArgsManager = new();
+    private MapLayerDef? layerDef;
+    private readonly Icon iconAddLayer = new Icons.Regular.Size20.Map();
+    private readonly Icon iconRemoveLayer = new Icons.Filled.Size20.Map();
+    private Icon layerIcon => layerDef == null ? iconAddLayer : iconRemoveLayer;
+    private string layerLabel => layerDef == null ? "Add Layer" : "Remove Layer";
+
+    private async Task ManagerReady(MapsManagerEventArgs args)
+    {
+        try
+        {
+            if (args.Success)
+                this.mapsManager = args.Manager;
+            else
+            {
+                ToastService.ShowError(args.ExceptionMessage);
+                return;
+            }
+
+            var options = MapHelpers.GetDefaultCreateMapOptions();
+            var controls = MapHelpers.GetDefaultControls();
+            await mapsManager!.CreateMap(mapA, options: options, controls: controls, logLevel: LogLevel.Trace);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    #region JsInterop
+
+    private async Task MapEvent(MapEventArgs args)
+    {
+        eventArgsManager.Add(args);
+    }
+
+    private async Task MapEventError(MapEventArgs args)
+    {
+        eventArgsManager.Add(args);
+    }
+
+    private async Task MapEventReady(MapEventArgs args)
+    {
+        eventArgsManager.Add(args);
+
+        try
+        {
+            switch (args.MapId)
+            {
+                case mapA:
+                    mapInteropA = mapsManager!.GetInterop(mapA);
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    #endregion
+
+    private async Task ResetMap()
+    {
+        try
+        {
+            if (mapInteropA == null) return;
+
+            await ClearEvents(true);
+
+            if (layerDef != null)
+            {
+                await mapInteropA.Layers.Remove([layerDef]);
+                layerDef = null;
+            }
+
+            await mapInteropA.Configurations.SetMapOptions(MapHelpers.GetDefaultSetMapOptions());
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task AddRemoveLayer()
+    {
+        try
+        {
+            if (mapInteropA == null) return;
+
+            if (layerDef == null)
+            {
+                layerDef = await mapInteropA.AddBasicMapLayer(DataService, MapLayerType.Symbol);
+                StateHasChanged();
+            }
+            else
+            {
+                await mapInteropA.Layers.Remove([layerDef]);
+                layerDef = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task OnMapEventsCheckedChanged(bool value, MapEventType? type)
+    {
+        try
+        {
+            if (mapInteropA == null || type == null) return;
+
+            var item = mapEvents.First(e => e.Type == type);
+            if (item.IsLoaded == value)
+                return;
+
+            if (value)
+                await mapInteropA.Events.Add([item.EventDef]);
+            else
+                await mapInteropA.Events.Remove([item.EventDef]);
+
+            item.IsLoaded = value;
+
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task ClearEvents(bool clearArgs)
+    {
+        try
+        {
+            if (mapInteropA == null) return;
+
+            var items = mapEvents.Where(e => e.IsLoaded);
+
+            await mapInteropA.Events.Remove(items.Select(i => i.EventDef));
+
+            foreach (var item in items)
+                item.IsLoaded = false;
+
+            if (clearArgs)
+                eventArgsManager.Clear();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+}
