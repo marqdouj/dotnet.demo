@@ -7,7 +7,7 @@
 @inject IToastService ToastService
 
 <FluentLayout>
-    <BzMapsPageHeader Header="@header" LayerDef="@null" @bind-ShowNarrative="@showNarrative">
+    <BzMapsPageHeader Header="@header" LayerDef="@null" HRefSource="@hRefSource" @bind-ShowNarrative="@showNarrative">
         <FluentLabel>
             <FluentLabel>
                 This example demonstrates adding more than one Azure Map component to a page.
@@ -70,6 +70,7 @@
     private const string mapB = "mapB";
     private string divStyle => "height:400px;width:100%;border:groove;border-width:1";
     private string cardWidth => "400px";
+    private string hRefSource => nameof(BzMapsMultipleS).ToBzMapsPageSource();
     private IAzMapsManager? mapsManager;
     private IAzMapInterop? mapInteropA;
     private IAzMapInterop? mapInteropB;

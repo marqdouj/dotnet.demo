@@ -15,7 +15,7 @@
 @inject IAzureMapsUIXmlService XmlService
 
 <FluentLayout>
-    <BzMapsPageHeader Header="@header" LayerDef="@null" @bind-ShowNarrative="@showNarrative">
+    <BzMapsPageHeader Header="@header" LayerDef="@null" HRefSource="@hRefSource" @bind-ShowNarrative="@showNarrative">
         <FluentLabel>
             <FluentLabel>
                 This example demonstrates each type of basic map layer this library supports. 
@@ -77,11 +77,11 @@
     private string mapHeight = "400px";
     private string mapWidth = "100%";
     private string mapDivStyle => $"height:{mapHeight};width:{mapWidth};border:groove;border-width:1";
+    private string hRefSource => nameof(BzMapsLayersS).ToBzMapsPageSource();
     private bool mapReady => mapInterop is not null;
     private bool overlay;
     private bool disabled => overlay || mapsManager == null;
     private bool disabledMap => disabled || !mapReady;
-    private string hRefSource => nameof(BzMapsLayersS).ToBzMapsPageSource();
     private MapOptionsSet resetOptions = MapHelpers.GetDefaultSetMapOptions();
     private readonly List<LayerDefViewModel> layers = [];
     private bool useUI = true;
