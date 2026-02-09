@@ -1,0 +1,369 @@
+﻿@using DemoApp.Shared.Models.BlazorMaps
+@using Marqdouj.DotNet.AzureMaps.Blazor.Components
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Animations
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Common
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Configuration
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Events
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.GeoJson
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Images
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Interop
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Layers
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Utilities
+@implements IDisposable
+@inject ILogger<BzMapsPizzaS> Logger
+@inject IJSRuntime JSRuntime
+@inject IToastService ToastService
+@inject IBzMapsDataService DataService
+
+<FluentLayout>
+    <BzMapsPageHeader Header="@header" LayerDef="@null" HRefSource="@hRefSource" @bind-ShowNarrative="@showNarrative">
+        <FluentLabel>
+            This example demonstrates a scenario where animations would be suitable, i.e. Pizza Delivery!
+            <br />
+            <CodeText>NOTE:</CodeText> You must include the animations script in App.Razor.
+        </FluentLabel>
+    </BzMapsPageHeader>
+
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentToolbar>
+            <FluentButton Disabled="@disabled" IconStart="@(new Icons.Regular.Size20.ArrowReset())" Title="Reset Map" OnClick="@ResetMap" />
+            <FluentSpacer Width="8" />
+            <FluentButton Disabled="@disabledA" OnClick="@ToggleTracking">
+                <FluentIcon Value="@stopStartIcon" Slot="start" />
+                @stopStartLabel
+            </FluentButton>
+            <FluentSpacer Width="3" />
+            <FluentCheckbox Disabled="@disabledStart" @bind-Value="@useAnimations">Use Animations</FluentCheckbox>
+        </FluentToolbar>
+
+        <MapsContainer OnManagerReady="@ManagerReady"
+                       OnMapEventReady="@MapEventReady"
+                       OnMapEventError="@MapEventError">
+            <div id="@mapId" style="@mapDivStyle">
+            </div>
+        </MapsContainer>
+    </FluentStack>
+</FluentLayout>
+
+<FluentOverlay @bind-Visible="@overlay"
+               Transparent="false">
+    <FluentProgressRing />
+</FluentOverlay>
+
+@code {
+    private const string header = "Animations";
+    private const string mapId = "mapAnimation";
+    private string mapDivStyle => "height:400px;width:100%;border:groove;border-width:1";
+    private string hRefSource => nameof(BzMapsPizzaS).ToBzMapsPageSource("Demos/");
+    private IAzMapsManager? mapsManager;
+    private IAzMapInterop? interopA;
+    private bool mapAReady => interopA is not null;
+    private bool showNarrative = true;
+    private bool overlay;
+    private bool disabled => overlay || mapsManager == null;
+    private bool disabledA => disabled || !mapAReady;
+    private bool disabledStart => disabledA || isTracking;
+    private bool isTracking;
+    private readonly Icon iconStart = new Icons.Regular.Size20.VehicleCar();
+    private readonly Icon iconStop = new Icons.Filled.Size20.Stop();
+    private Icon stopStartIcon => isTracking ? iconStop : iconStart;
+    private string stopStartLabel => isTracking ? "Stop" : "Start";
+    private readonly PeriodicTimer periodicTimer = new(TimeSpan.FromMilliseconds(1500));
+    private bool useAnimations;
+    private int currentCar = -1;
+    private int maxCar => carLocations.Count - 1;
+    private readonly List<CarLocation> carLocations = [];
+    private readonly MapFeatureDef car = new MapFeatureDef(new Point(new Position(0, 0)))
+    {
+        Properties = new Properties
+            {
+                { "title", "Pizza Delivery Car" },
+                { "demo", true },
+                { "heading", 90}
+            },
+        AsShape = true,
+    };
+    private readonly MapOptionsSet resetOptions = MapHelpers.GetDefaultSetMapOptions();
+    private readonly LayersGroup layers = new LayersGroup([
+            new LayerEventsGroup(MapLayerType.Symbol.GetDefaultLayerDef()),
+            new LayerEventsGroup(MapLayerType.Line.GetDefaultLayerDef())]);
+    private LineLayerDef lineLayerDef => (LineLayerDef)layers.GetLayer(MapLayerType.Line)!.Layer;
+    private SymbolLayerDef symbolLayerDef => (SymbolLayerDef)layers.GetLayer(MapLayerType.Symbol)!.Layer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var data = await DataService.GetSymbolLayerData();
+        resetOptions.Camera!.Camera!.Center = data[8];
+        resetOptions.Camera!.Camera!.Zoom = 11;
+
+        var max = data.Count - 1;
+        for (int i = 0; i < data.Count; i++)
+        {
+            Position? next = (i < max) ? data[i + 1] : null;
+            var carLoc = new CarLocation(data[i], next);
+            carLocations.Add(carLoc);
+        }
+    }
+
+    private async Task ManagerReady(MapsManagerEventArgs args)
+    {
+        try
+        {
+            if (args.Success)
+                this.mapsManager = args.Manager;
+            else
+            {
+                ToastService.ShowError(args.ExceptionMessage);
+                return;
+            }
+
+            var camera = resetOptions.Camera!.Camera!;
+            var options = MapHelpers.GetDefaultCreateMapOptions(camera.Center, (double)camera.Zoom!);
+            var controls = MapHelpers.GetDefaultControls();
+            await mapsManager!.CreateMap(mapId, options: options, controls: controls, logLevel: LogLevel.Trace);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    #region JsInterop
+
+    private async Task MapEventError(MapEventArgs args)
+    {
+        ToastService.ShowError($"Map Error! {args.Payload?.Error?.Message}");
+    }
+
+    private async Task MapEventReady(MapEventArgs args)
+    {
+        try
+        {
+            interopA = mapsManager!.GetInterop(mapId);
+            await AddMapLayers();
+            await RunTimer();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    #endregion
+
+    private async Task ResetMap()
+    {
+        try
+        {
+            if (interopA == null) return;
+
+            isTracking = false;
+            currentCar = -1;
+            await layers.ClearLayers(interopA);
+
+            await interopA.Configurations.SetMapOptions(resetOptions);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task AddMapLayers()
+    {
+        try
+        {
+            if (interopA == null) return;
+
+            overlay = true;
+
+            lineLayerDef.Options!.StrokeColor = HtmlColorName.Orchid.ToString();
+
+            var imageDef = new ImageTemplateDef(ImageTemplateName.car)
+            {
+                Color = HtmlColorName.DodgerBlue.ToString(),
+                SecondaryColor = HtmlColorName.Orange.ToString(),
+            };
+
+            await interopA.ImageSprites.CreateFromTemplate(imageDef);
+
+            var iconOptions = symbolLayerDef.Options!.IconOptions!;
+            iconOptions.ImageId = imageDef.Id;
+            iconOptions.AllowOverlap = true;
+            iconOptions.Anchor = PositionAnchor.Center;
+            iconOptions.IgnorePlacement = true;
+            iconOptions.RotationAlignment = MapItemAlignment.Map;
+            iconOptions.RotationSpecification = new List<string> { "get", "heading" };
+
+            await layers.AddLayers(interopA);
+
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+        finally
+        {
+            overlay = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task StartDemo()
+    {
+        try
+        {
+            if (interopA == null) return;
+
+            await ResetMap();
+
+            var line = carLocations.Select(e => e.Position).ToList();
+            var feature = new MapFeatureDef(new LineString(line))
+            {
+                Properties = new Properties
+                {
+                    { "title", "Pizza Delivery Route" },
+                    { "demo", true },
+                }
+            };
+
+            await interopA.Features.Add(feature, lineLayerDef.DataSource.Id!);
+
+            await AddCar();
+            isTracking = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+        finally
+        {
+            overlay = false;
+        }
+    }
+
+    private async Task StopDemo()
+    {
+        try
+        {
+            await ResetMap();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+        finally
+        {
+            overlay = false;
+        }
+    }
+
+    private async Task RunTimer()
+    {
+        while (await periodicTimer.WaitForNextTickAsync())
+        {
+            if (isTracking)
+            {
+                await AddCar();
+            }
+        }
+    }
+
+    private async Task ToggleTracking()
+    {
+        try
+        {
+            if (isTracking)
+                await StopDemo();
+            else
+                await StartDemo();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task AddCar()
+    {
+        if (interopA == null) return;
+        if (currentCar >= maxCar) return;
+
+        //Normally you would get the next data point (car location) from an API that is monitoring the car location.
+        //i.e. nextCar = await myApi.GetCarLocation(carId);
+
+        currentCar++;
+
+        var nextCar = carLocations[currentCar];
+        var geom = (Point)car!.Geometry;
+
+        geom.Coordinates = nextCar.Position;
+
+        if (currentCar < maxCar)
+            car.Properties!["heading"] = nextCar.Heading;
+
+        if (currentCar == 0)
+        {
+            await interopA.Features.Add(car, symbolLayerDef.DataSource.Id!);
+        }
+        else
+        {
+            if (useAnimations)
+            {
+                await interopA.Animations.AnimateShape(new ShapeAnimationOptions(car, symbolLayerDef.DataSource.Id!));
+            }
+            else
+            {
+                await interopA.Features.Update(car, symbolLayerDef.DataSource.Id!);
+            }
+        }
+
+        if (currentCar == 0)
+        {
+            ToastService.ShowInfo("Pizza is on it's way!");
+            return;
+        }
+
+        if (currentCar == maxCar - 1)
+        {
+            ToastService.ShowInfo("Pizza is about to arrive!");
+            return;
+        }
+
+        if (currentCar == maxCar)
+        {
+            isTracking = false;
+            ToastService.ShowInfo("Pizza has arrived!");
+            StateHasChanged();
+            return;
+        }
+    }
+
+    public void Dispose()
+    {
+        periodicTimer?.Dispose();
+    }
+
+    private class CarLocation
+    {
+        public CarLocation(Position position, Position? next)
+        {
+            Position = position;
+            if (next != null)
+            {
+                Heading = Gps.CalculateBearing(position.Latitude, position.Longitude, next.Latitude, next.Longitude);
+            }
+        }
+
+        public Position Position { get; }
+
+        public double Heading { get; } = 90;
+    }
+}

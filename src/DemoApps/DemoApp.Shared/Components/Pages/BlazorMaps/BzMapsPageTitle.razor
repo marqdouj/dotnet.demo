@@ -1,0 +1,9 @@
+﻿<PageTitle>@title</PageTitle>
+
+@code {
+    private string title => $"Azure Maps{content}";
+    private string content => string.IsNullOrWhiteSpace(SubTitle) ? "" : $" ({SubTitle})";
+
+    [Parameter]
+    public string? SubTitle { get; set; }
+}

@@ -1,0 +1,263 @@
+﻿@using DemoApp.Shared.Models.BlazorMaps
+@using Marqdouj.DotNet.AzureMaps.Blazor.Components
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Configuration
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Events
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.GeoJson
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Interop
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Layers
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Utilities
+@inject ILogger<BzMapsUtilitiesS> Logger
+@inject IToastService ToastService
+@inject IBzMapsDataService DataService
+@inject IJSRuntime JSRuntime
+
+<FluentLayout>
+    <BzMapsPageHeader Header="@header" LayerDef="@null" HRefSource="@hRefSource" @bind-ShowNarrative="@showNarrative">
+        <FluentLabel>
+            This page demonstrates use of the 'GPS' and 'Mercators' utilities.
+        </FluentLabel>
+    </BzMapsPageHeader>
+
+    <FluentTabs>
+        <FluentTab Label="GPS">
+            <FluentCard AreaRestricted="false">
+                <FluentLabel Typo="Typography.Subject">Calculate Bearing</FluentLabel>
+                <br />
+                <FluentStack HorizontalAlignment="HorizontalAlignment.Left">
+                    <FluentStack Orientation="Orientation.Vertical" Width="250px">
+                        <FluentLabel>From Position</FluentLabel>
+                        <FluentSelect TOption="string" Height="250px" @bind-Value="@gpsFrom">
+                            @foreach (var model in models)
+                            {
+                                <FluentOption Value="@model.Value">@model.Text</FluentOption>
+                            }
+                        </FluentSelect>
+                    </FluentStack>
+
+                    <FluentStack Orientation="Orientation.Vertical" Width="250px">
+                        <FluentLabel>To Position</FluentLabel>
+                        <FluentSelect TOption="string" Height="250px" @bind-Value="@gpsTo">
+                            @foreach (var model in models)
+                            {
+                                <FluentOption Value="@model.Value">@model.Text</FluentOption>
+                            }
+                        </FluentSelect>
+                    </FluentStack>
+                </FluentStack>
+                <br />
+                <FluentStack>
+                    <FluentLabel>Bearing (degrees): @bearing</FluentLabel>
+                    <FluentButton Disabled="@disabledMap" IconStart="@(new Icons.Regular.Size20.GlobeLocation())" Title="Display on Map" OnClick="@ShowGpsCalcuationOnMap" />
+                </FluentStack>
+            </FluentCard>
+            <MapsContainer OnManagerReady="@ManagerReady"
+                           OnMapEventReady="@MapEventReady"
+                           OnMapEventError="@MapEventError">
+                <div id="@mapId" style="@mapDivStyle">
+                </div>
+            </MapsContainer>
+        </FluentTab>
+
+        <FluentTab Label="Mercators">
+            <FluentCard AreaRestricted="false">
+                <FluentCard AreaRestricted="false">
+                    <FluentButton IconStart="@(new Icons.Regular.Size20.DesignIdeas())" Title="Do Conversions" OnClick="@GetMercatorResults" />
+                    <FluentLabel>Position:</FluentLabel>
+                    <FluentStack>
+                        <FluentNumberField @bind-Value="@mercatorPosition.Longitude" Label="Longitude" />
+                        <FluentNumberField @bind-Value="@mercatorPosition.Latitude" Label="Latitude" />
+                    </FluentStack>
+                </FluentCard>
+                <FluentCard AreaRestricted="false">
+                    <FluentLabel Typo="Typography.Subject">Results:</FluentLabel>
+                    <FluentStack Orientation="Orientation.Vertical">
+                        <FluentLabel>@results.FromPosition</FluentLabel>
+                        <FluentLabel>@results.ToPosition</FluentLabel>
+                        <FluentLabel>@results.MercatorScale</FluentLabel>
+                        <FluentLabel>@results.MeterInMercatorUnits</FluentLabel>
+                    </FluentStack>
+                </FluentCard>
+            </FluentCard>
+        </FluentTab>
+    </FluentTabs>
+</FluentLayout>
+
+@code {
+    private const string mapId = "mapUtilities";
+    private const string header = "Utilities";
+    private string mapHeight = "400px";
+    private string mapWidth = "100%";
+    private string mapDivStyle => $"height:{mapHeight};width:{mapWidth};border:groove;border-width:1";
+    private bool mapReady => mapInterop is not null;
+    private bool disabled => mapsManager == null;
+    private bool disabledMap => disabled || !mapReady;
+    private string hRefSource => nameof(BzMapsUtilitiesS).ToBzMapsPageSource();
+    private bool showNarrative = true;
+    private IAzMapsManager? mapsManager;
+    private IAzMapInterop? mapInterop;
+    private readonly List<PositionViewModel> models = [];
+    private List<Option<int>> gpsItems = [];
+    private string? gpsFrom;
+    private string? gpsTo;
+    private string? bearing => CalcuateGpsFromBearing();
+    private Position? gpsFromPosition;
+    private Position? gpsToPosition;
+    private readonly MapLayerDef gpsLayerDef = MapLayerType.Line.GetDefaultLayerDef();
+    private readonly Position mercatorPosition = new Position(-122.33, 47.6); // (Seattle, WA)
+    private Mercators? mercators;
+    private MercatorResults results = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        mercators = new(JSRuntime);
+
+        var data = await DataService.GetLineLayerData();
+
+        for (int i = 0; i < data.Count; i++)
+            models.Add(new(data[i], i));
+    }
+
+    private async Task ResetMap()
+    {
+        try
+        {
+            if (mapInterop == null) return;
+
+            await mapInterop.Sources.Clear(gpsLayerDef.DataSource);
+            await mapInterop.Configurations.SetMapOptions(MapHelpers.GetDefaultSetMapOptions());
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task ManagerReady(MapsManagerEventArgs args)
+    {
+        try
+        {
+            if (args.Success)
+                this.mapsManager = args.Manager;
+            else
+            {
+                ToastService.ShowError(args.ExceptionMessage);
+                return;
+            }
+
+            var options = MapHelpers.GetDefaultCreateMapOptions();
+            var controls = MapHelpers.GetDefaultControls();
+            await mapsManager!.CreateMap(mapId, options: options, controls: controls, logLevel: LogLevel.Trace);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+    private async Task MapEventError(MapEventArgs args)
+    {
+        ToastService.ShowError(args.Payload!.Error!.ToString());
+    }
+
+    private async Task MapEventReady(MapEventArgs args)
+    {
+        try
+        {
+            mapInterop = mapsManager!.GetInterop(mapId);
+            await mapInterop.Layers.Add(gpsLayerDef);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task ShowGpsCalcuationOnMap()
+    {
+        try
+        {
+            if (mapInterop is null || gpsFromPosition is null || gpsToPosition is null) return;
+
+            await mapInterop.Sources.Clear(gpsLayerDef.DataSource);
+            var lineDef = new MapFeatureDef(new LineString([gpsFromPosition, gpsToPosition]));
+            await mapInterop.Features.Add(lineDef, gpsLayerDef.DataSource.Id);
+            await mapInterop.Configurations.ZoomTo(gpsFromPosition, 11.5);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private string? CalcuateGpsFromBearing()
+    {
+        try
+        {
+            var from = int.Parse(gpsFrom ?? "0");
+            var to = int.Parse(gpsTo ?? "0");
+            gpsFromPosition = models[from].Position;
+            gpsToPosition = models[to].Position;
+
+            var result = Gps.CalculateBearing(gpsFromPosition.Latitude, gpsFromPosition.Longitude, gpsToPosition.Latitude, gpsToPosition.Longitude);
+            return result.ToString();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+            return null;
+        }
+    }
+
+    private void GpsFromValueChanged(string? value)
+    {
+        ToastService.ShowInfo($"GPS From ValueChanged: {value}");
+    }
+
+    private async Task GetMercatorResults()
+    {
+        try
+        {
+            if (mercators is null) return;
+
+            var data = (Position)mercatorPosition.Clone();
+            var fromPosition = await mercators.FromPosition(data);
+            var toPosition = await mercators.ToPosition(fromPosition);
+            var mercatorScale = await mercators.MercatorScale(data.Latitude);
+            var meterInMercatorUnits = await mercators.MeterInMercatorUnits(mercatorPosition.Latitude);
+
+            var conv = new MercatorResults
+            {
+                FromPosition = $"FromPosition: {fromPosition}",
+                ToPosition = $"ToPosition: {toPosition}",
+                MercatorScale = $"MercatorScale: Latitude:{data.Latitude} Scale:{mercatorScale}",
+                MeterInMercatorUnits = $"MeterInMercatorUnits: Latitude:{data.Latitude} Units:{meterInMercatorUnits}"
+            };
+
+            results = conv;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private class PositionViewModel(Position position, int index)
+    {
+        public Position Position { get; } = position;
+        public string Text => $"{Position.ToString("G8")}";
+        public string Value { get; set; } = index.ToString();
+    }
+
+    private class MercatorResults()
+    {
+        public string? FromPosition { get; set; }
+        public string? ToPosition { get; set; }
+        public string? MercatorScale { get; set; }
+        public string? MeterInMercatorUnits { get; set; }
+    }
+}

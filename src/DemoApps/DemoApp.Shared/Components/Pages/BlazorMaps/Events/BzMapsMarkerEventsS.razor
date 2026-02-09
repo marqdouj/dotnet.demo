@@ -1,0 +1,256 @@
+﻿@using DemoApp.Shared.Models.BlazorMaps
+@using Marqdouj.DotNet.AzureMaps.Blazor.Components
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Configuration
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Events
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Interop
+@using Marqdouj.DotNet.AzureMaps.Blazor.Models.Layers
+@inject ILogger<BzMapsMarkerEventsS> Logger
+@inject IJSRuntime JSRuntime
+@inject IToastService ToastService
+@inject IBzMapsDataService DataService
+
+<FluentLayout>
+    <BzMapsPageHeader Header="@header" LayerDef="@null" HRefSource="@hRefSource" @bind-ShowNarrative="@showNarrative">
+        <FluentLabel>
+            This example demonstrates dynamically adding/removing HtmlMarker events.
+        </FluentLabel>
+    </BzMapsPageHeader>
+
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentToolbar>
+            <FluentButton Disabled="@disabled" IconStart="@(new Icons.Regular.Size20.ArrowReset())" Title="Reset Map" OnClick="@ResetMap" />
+        </FluentToolbar>
+
+        <FluentStack>
+            <FluentCard Height="@mapHeight" Width="250px" Style="overflow:auto">
+                <div>
+                    <FluentStack Orientation="Orientation.Vertical">
+                        @foreach (var item in mapEvents)
+                        {
+                            <FluentCheckbox Disabled="@disabledA" @bind-Value:get="@item.IsLoaded" @bind-Value:set="@((e) => OnMapEventsCheckedChanged(e, item.Type))">@item.Name</FluentCheckbox>
+                        }
+                    </FluentStack>
+                </div>
+            </FluentCard>
+
+            <MapsContainer OnManagerReady="@ManagerReady"
+                           OnMapEventReady="@MapEventReady"
+                           OnMapEventError="@MapEventError"
+                           OnMapEvent="@MapEvent">
+                <div id="@mapA" tabindex="0" style="@mapDivStyle">
+                </div>
+            </MapsContainer>
+        </FluentStack>
+
+        <BzMapsEventViewer Events="@eventArgsManager" Mulitline="true" />
+    </FluentStack>
+</FluentLayout>
+
+<FluentOverlay @bind-Visible="@overlay"
+               Transparent="false">
+    <FluentProgressRing />
+</FluentOverlay>
+
+@code {
+    private const string header = "Marker Events";
+    private const string mapA = "mapA";
+    private const string mapHeight = "350px";
+    private string mapDivStyle => "height:350px;width:100%;border:groove;border-width:1";
+    private string hRefSource => nameof(BzMapsMarkerEventsS).ToBzMapsPageSource("Events/");
+    private IAzMapsManager? mapsManager;
+    private IAzMapInterop? mapInteropA;
+    private readonly List<MapEventViewModel> mapEvents
+        = MapEventTarget.HtmlMarker.GetMapEventDefs()
+        .Select(e => new MapEventViewModel(e)).ToList();
+    private const string htmlContent = "<div style='width:24px;height:24px;background-color:#FF5733;border-radius:50%;border:2px solid white;box-shadow:0 0 5px rgba(0,0,0,0.3);'></div>";
+    private readonly List<HtmlMarkerDef> markers = [];
+    private bool mapAReady => mapInteropA is not null;
+    private bool overlay;
+    private bool disabled => overlay || mapsManager == null;
+    private bool disabledA => disabled || !mapAReady;
+    private bool showNarrative = true;
+    private readonly MapEventArgsViewModelManager eventArgsManager = new();
+    private readonly MapOptionsSet resetOptions = MapHelpers.GetDefaultSetMapOptions();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var data = (await DataService.GetSymbolLayerData());
+
+        foreach (var position in data)
+        {
+            markers.Add(new HtmlMarkerDef
+            {
+                Options = new HtmlMarkerOptions
+                {
+                    Color = "#FF5733",
+                    Draggable = true,
+                    HtmlContent = htmlContent,
+                    Position = position,
+                    Text = "●",
+                }
+            });
+        }
+
+        resetOptions.Camera!.Camera!.Center = data[8];
+        resetOptions.Camera!.Camera!.Zoom = 11;
+
+        //These events are listed in the Azure Maps SDK (and shown in examples), 
+        //however they are not supported directly by the API (and don't even work in the examples).
+        //These events require special handling which I have not yet implemented;
+        //I've removed them for now.
+        mapEvents.Remove(mapEvents.First(e => e.Type == MapEventType.KeyDown));
+        mapEvents.Remove(mapEvents.First(e => e.Type == MapEventType.KeyPress));
+        mapEvents.Remove(mapEvents.First(e => e.Type == MapEventType.KeyUp));
+    }
+
+    private async Task ManagerReady(MapsManagerEventArgs args)
+    {
+        try
+        {
+            if (args.Success)
+                this.mapsManager = args.Manager;
+            else
+            {
+                ToastService.ShowError(args.ExceptionMessage);
+                return;
+            }
+
+            var camera = resetOptions.Camera!.Camera!;
+            var options = MapHelpers.GetDefaultCreateMapOptions(camera.Center, (double)camera.Zoom!);
+            var controls = MapHelpers.GetDefaultControls();
+            await mapsManager!.CreateMap(mapA, options: options, controls: controls, logLevel: LogLevel.Trace);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    #region JsInterop
+
+    private async Task MapEvent(MapEventArgs args)
+    {
+        eventArgsManager.Add(args);
+    }
+
+    private async Task MapEventError(MapEventArgs args)
+    {
+        eventArgsManager.Add(args);
+    }
+
+    private async Task MapEventReady(MapEventArgs args)
+    {
+        eventArgsManager.Add(args);
+
+        try
+        {
+
+            switch (args.MapId)
+            {
+                case mapA:
+                    mapInteropA = mapsManager!.GetInterop(mapA);
+                    await mapInteropA.Markers.Add(markers);
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    #endregion
+
+    private async Task ResetMap()
+    {
+        try
+        {
+            if (mapInteropA == null) return;
+
+            await ClearEvents(true);
+
+            await mapInteropA.Markers.Remove(markers);
+            await mapInteropA.Markers.Add(markers);
+            await mapInteropA.Configurations.SetMapOptions(resetOptions);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task MarkerKeyEvent(KeyboardEventArgs args, HtmlMarkerDef marker)
+    {
+        try
+        {
+            ToastService.ShowInfo($"Marker {marker.Id} received key event: {args.Code}");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task OnMapEventsCheckedChanged(bool value, MapEventType? type)
+    {
+        try
+        {
+            if (mapInteropA == null || type == null) return;
+
+            var item = mapEvents.First(e => e.Type == type);
+            if (item.IsLoaded == value)
+                return;
+
+            foreach (var marker in markers)
+            {
+                item.EventDef.TargetId = marker.Id;
+                if (value)
+                    await mapInteropA.Events.Add(item.EventDef);
+                else
+                    await mapInteropA.Events.Remove(item.EventDef);
+            }
+
+            item.IsLoaded = value;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task ClearEvents(bool clearArgs)
+    {
+        try
+        {
+            if (mapInteropA == null) return;
+
+            var items = mapEvents.Where(e => e.IsLoaded);
+
+            foreach (var item in items.Select(i => i.EventDef))
+            {
+                foreach (var marker in markers)
+                {
+                    item.TargetId = marker.Id;
+                    await mapInteropA.Events.Remove(item);
+                }
+            }
+
+            foreach (var item in items)
+                item.IsLoaded = false;
+
+            if (clearArgs)
+                eventArgsManager.Clear();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            ToastService.ShowError(ex.Message);
+        }
+    }
+}
