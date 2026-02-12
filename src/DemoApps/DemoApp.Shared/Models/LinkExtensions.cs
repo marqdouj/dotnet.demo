@@ -11,6 +11,7 @@
         General,
         MailDev,
         MailKit,
+        Modules,
     }
 
     public static class LinkExtensions
@@ -85,6 +86,7 @@
                 HRefRepository.General => $"{prefix}DotNet.General",
                 HRefRepository.MailDev => "DotNet.Aspire.MailDev",
                 HRefRepository.MailKit => "DotNet.Aspire.MailKit",
+                HRefRepository.Modules => $"{prefix}DotNet.Web.JsInterop.Modules",
                 _ => throw new ArgumentOutOfRangeException(nameof(repository)),
             };
         }
