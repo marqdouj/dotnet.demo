@@ -1,23 +1,26 @@
-﻿@using DemoApp.Shared.Models
-@using Marqdouj.DotNet.Web.Components.Logger
-@using Microsoft.Extensions.Logging
-@inject IJSLoggerService<PkgJSLoggerS> LoggerService
+﻿@* @page "/modules-jslogger"
+@rendermode InteractiveServer *@
+@using Marqdouj.DotNet.Web.JsInterop.Modules.Logger
+@implements IAsyncDisposable
+@inject IToastService ToastService
+@inject ILogger<JsLoggerS> Logger
+@inject IJSRuntime JSRuntime
 
-<PageTitle>Components - JS Logger</PageTitle>
+<PageTitle>Modules - @subject</PageTitle>
 
 <FluentLayout>
     <PkgPageHeader Header="@subject"
                    HRefCode="@hRefCode"
                    Subject="@subject">
         <FluentLabel>
-            JS Logger Service logs message to the browser console.<br />
-            Open the 'Developer Tools' to view the output in the browser console.<br />
+            JSInterop Module that logs messages to the browser console.<br />
+            Open the browser 'Developer Tools' to view the output in the browser console.<br />
             You may also have to adjust the log level for console messages.
         </FluentLabel>
     </PkgPageHeader>
 
     <FluentCard>
-        <FluentLabel Typo="Typography.Subject">Logger Module (IJSObjectReference)</FluentLabel>
+        <FluentLabel Typo="Typography.Subject">JS Logger Module</FluentLabel>
         <FluentToolbar>
             <FluentButton @onclick="(() => TestLogger())">Test All</FluentButton>
             <FluentSpacer />
@@ -34,13 +37,23 @@
     </FluentCard>
 </FluentLayout>
 
+<FluentOverlay @bind-Visible="@overlay"
+               Transparent="false">
+    <FluentProgressRing />
+</FluentOverlay>
+
 @code {
-    private readonly string hRefCode = HRefRepository.Components.GitHubSrcItem(null, "Logger/JSLogger.cs");
-    private readonly string subject = "JS Logger Service";
+    private readonly string hRefCode = HRefRepository.Modules.GitHubSrcItem(path: "Logger/JsLoggerInterop.cs");
+    private readonly string subject = "JS Logger";
+    private JSLoggerInterop<JsLoggerS>? interop;
+    private JSLoggerInterop<JsLoggerS> LoggerService => interop!;
+    private bool overlay;
+    private bool disabled => overlay || interop == null;
 
     protected override void OnInitialized()
     {
-        LoggerService.Config.SetLevel(LogLevel.Trace, LogLevel.Critical);
+        interop = new JSLoggerInterop<JsLoggerS>(JSRuntime);
+        interop.Config.SetLevel(LogLevel.Trace, LogLevel.Critical);
     }
 
     private async Task TestRaw()
@@ -48,14 +61,14 @@
         await LoggerService.LogRaw("Test 'Raw' from Module", "color: orange; font-size: 20px;");
     }
 
-    private void TestScope()
+    private async Task TestScope()
     {
         using (var scope = LoggerService.BeginScope("TestScope"))
         {
             var t = DateTime.Now.ToShortTimeString();
-            LoggerService.LogInformation($"'Test Scope 1 of 3' from LoggerService : {t}");
-            LoggerService.LogInformation($"'Test Scope 2 of 3' from LoggerService : {t}");
-            LoggerService.LogInformation($"'Test Scope 3 of 3' from LoggerService : {t}");
+            await LoggerService.LogInformation($"'Test Scope 1 of 3' from LoggerService : {t}");
+            await LoggerService.LogInformation($"'Test Scope 2 of 3' from LoggerService : {t}");
+            await LoggerService.LogInformation($"'Test Scope 3 of 3' from LoggerService : {t}");
         }
     }
 
@@ -100,6 +113,19 @@
                 break;
             default:
                 break;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            if (interop is not null)
+                await interop!.DisposeAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
         }
     }
 }

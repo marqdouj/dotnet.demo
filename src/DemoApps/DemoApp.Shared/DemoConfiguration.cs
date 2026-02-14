@@ -35,9 +35,10 @@ namespace DemoApp.Shared
             services.AddSingleton<IDemoConfiguration>(new DemoConfiguration(mode, builder.Environment.IsDevelopment()));
 
             #region Marqdouj.DotNet.Web.Components
-            services.AddJSLoggerService();
-            services.AddScoped<IGeolocationService, GeolocationService>(); //Also used with Azure Maps demo.
-            services.AddScoped<IResizeObserverService, ResizeObserverService>();
+            // These services are obsolete = see 'Modules' demo.
+            //services.AddJSLoggerService();
+            //services.AddScoped<IGeolocationService, GeolocationService>(); //Also used with Azure Maps demo.
+            //services.AddScoped<IResizeObserverService, ResizeObserverService>();
             #endregion
 
             #region Marqdouj.DotNet.AzureMaps
