@@ -58,6 +58,32 @@ namespace DemoApp.Shared.Components.Pages.BlazorMaps
             return inputs;
         }
 
+        public static List<MapFeatureDef> GetDefaultSymbolLayerFeatures(this List<Position> data)
+        {
+            var results = new List<MapFeatureDef<Point>>();
+            var counter = 0;
+
+            foreach (var position in data)
+            {
+                counter++;
+
+                var feature = new MapFeatureDef<Point>(new Point(position))
+                {
+                    Properties = new Properties
+                    {
+                        { "title", $"my symbol #{counter}" },
+                        { "description", $"my symbol #{counter} description" },
+                        { "demo", true },
+                    },
+                    Id = $"demoSymbol-{counter}"
+                };
+
+                results.Add(feature);
+            }
+
+            return [.. results.Cast<MapFeatureDef>()];
+        }
+
         public static async Task<List<MapFeatureDef>> GetDefaultSymbolLayerFeatures(this IBzMapsDataService dataService)
         {
             var results = new List<MapFeatureDef>();
@@ -235,14 +261,7 @@ namespace DemoApp.Shared.Components.Pages.BlazorMaps
             await mapsInterop.Layers.Add([layerDef], events);
 
             var data = await dataService.GetLineLayerData();
-            var feature = new MapFeatureDef(new LineString(data))
-            {
-                Properties = new Properties
-                {
-                    { "title", "my line" },
-                    { "demo", true },
-                }
-            };
+            var feature = data.GetLineLayerFeatureDef();
 
             await mapsInterop.Features.Add(feature, layerDef.DataSource.Id!);
 
@@ -250,6 +269,18 @@ namespace DemoApp.Shared.Components.Pages.BlazorMaps
                 await mapsInterop.Configurations.ZoomTo(data[8], 11);
 
             return layerDef;
+        }
+
+        public static MapFeatureDef<LineString> GetLineLayerFeatureDef(this List<Position> data)
+        {
+            return new MapFeatureDef<LineString>(new LineString(data))
+            {
+                Properties = new Properties
+                {
+                    { "title", "my line" },
+                    { "demo", true },
+                }
+            };
         }
 
         private static async Task<MapLayerDef> AddPolygonLayer(IAzMapInterop mapsInterop, IBzMapsDataService dataService, PolygonLayerDef layerDef, bool zoomTo, IEnumerable<MapEventDef>? events = null)
